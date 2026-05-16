@@ -1,0 +1,26 @@
+* text=auto eol=lf
+
+*.cs       text eol=lf diff=csharp
+*.csproj   text eol=lf
+*.sln      text eol=crlf
+*.props    text eol=lf
+*.targets  text eol=lf
+*.nuspec   text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.json     text eol=lf
+*.md       text eol=lf
+*.ps1      text eol=crlf
+*.sh       text eol=lf
+
+# Generated files — collapse in GitHub PR view
+src/Bgfx.Net/Generated/bgfx.raw.cs linguist-generated=true
+src/Bgfx.Net/Generated/bgfx.g.cs   linguist-generated=true
+
+# Binary
+*.dll      binary
+*.so       binary
+*.dylib    binary
+*.exe      binary
+*.pdb      binary
+*.png      binary

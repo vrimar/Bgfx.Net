@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Bgfx.Net.Tools</RootNamespace>
+    <AssemblyName>Bgfx.Net.Tools</AssemblyName>
+
+    <IsPackable>true</IsPackable>
+    <PackageId>Bgfx.Net.Tools</PackageId>
+    <Description>MSBuild integration for bgfx's shaderc, texturec, and geometryc tools. Add BgfxShader items to your csproj and shader sources will be compiled at build time.</Description>
+    <PackageTags>bgfx;shaderc;msbuild;shader;graphics</PackageTags>
+
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+
+    <ToolsArtifactsDir Condition="'$(ToolsArtifactsDir)' == ''">$(MSBuildThisFileDirectory)..\..\artifacts\tools\</ToolsArtifactsDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="build\Bgfx.Net.Tools.targets" Pack="true" PackagePath="build\Bgfx.Net.Tools.targets" />
+    <None Include="build\Bgfx.Net.Tools.props"   Pack="true" PackagePath="build\Bgfx.Net.Tools.props" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ToolsArtifactsDir)win-x64\shaderc.exe"      Pack="true" PackagePath="runtimes\win-x64\native\shaderc.exe"     Condition="Exists('$(ToolsArtifactsDir)win-x64\shaderc.exe')" />
+    <None Include="$(ToolsArtifactsDir)win-x64\texturec.exe"     Pack="true" PackagePath="runtimes\win-x64\native\texturec.exe"    Condition="Exists('$(ToolsArtifactsDir)win-x64\texturec.exe')" />
+    <None Include="$(ToolsArtifactsDir)win-x64\geometryc.exe"    Pack="true" PackagePath="runtimes\win-x64\native\geometryc.exe"   Condition="Exists('$(ToolsArtifactsDir)win-x64\geometryc.exe')" />
+
+    <None Include="$(ToolsArtifactsDir)linux-x64\shaderc"        Pack="true" PackagePath="runtimes\linux-x64\native\shaderc"        Condition="Exists('$(ToolsArtifactsDir)linux-x64\shaderc')" />
+    <None Include="$(ToolsArtifactsDir)linux-x64\texturec"       Pack="true" PackagePath="runtimes\linux-x64\native\texturec"       Condition="Exists('$(ToolsArtifactsDir)linux-x64\texturec')" />
+    <None Include="$(ToolsArtifactsDir)linux-x64\geometryc"      Pack="true" PackagePath="runtimes\linux-x64\native\geometryc"      Condition="Exists('$(ToolsArtifactsDir)linux-x64\geometryc')" />
+
+    <None Include="$(ToolsArtifactsDir)linux-arm64\shaderc"      Pack="true" PackagePath="runtimes\linux-arm64\native\shaderc"      Condition="Exists('$(ToolsArtifactsDir)linux-arm64\shaderc')" />
+    <None Include="$(ToolsArtifactsDir)linux-arm64\texturec"     Pack="true" PackagePath="runtimes\linux-arm64\native\texturec"     Condition="Exists('$(ToolsArtifactsDir)linux-arm64\texturec')" />
+    <None Include="$(ToolsArtifactsDir)linux-arm64\geometryc"    Pack="true" PackagePath="runtimes\linux-arm64\native\geometryc"    Condition="Exists('$(ToolsArtifactsDir)linux-arm64\geometryc')" />
+
+    <None Include="$(ToolsArtifactsDir)osx-x64\shaderc"          Pack="true" PackagePath="runtimes\osx-x64\native\shaderc"          Condition="Exists('$(ToolsArtifactsDir)osx-x64\shaderc')" />
+    <None Include="$(ToolsArtifactsDir)osx-x64\texturec"         Pack="true" PackagePath="runtimes\osx-x64\native\texturec"         Condition="Exists('$(ToolsArtifactsDir)osx-x64\texturec')" />
+    <None Include="$(ToolsArtifactsDir)osx-x64\geometryc"        Pack="true" PackagePath="runtimes\osx-x64\native\geometryc"        Condition="Exists('$(ToolsArtifactsDir)osx-x64\geometryc')" />
+
+    <None Include="$(ToolsArtifactsDir)osx-arm64\shaderc"        Pack="true" PackagePath="runtimes\osx-arm64\native\shaderc"        Condition="Exists('$(ToolsArtifactsDir)osx-arm64\shaderc')" />
+    <None Include="$(ToolsArtifactsDir)osx-arm64\texturec"       Pack="true" PackagePath="runtimes\osx-arm64\native\texturec"       Condition="Exists('$(ToolsArtifactsDir)osx-arm64\texturec')" />
+    <None Include="$(ToolsArtifactsDir)osx-arm64\geometryc"      Pack="true" PackagePath="runtimes\osx-arm64\native\geometryc"      Condition="Exists('$(ToolsArtifactsDir)osx-arm64\geometryc')" />
+
+    <!-- RID-agnostic shader headers — consumer .sc files include these via $(BgfxShaderIncludePath). -->
+    <None Include="$(ToolsArtifactsDir)include\*.sh" Pack="true" PackagePath="build\shaders\include\" />
+  </ItemGroup>
+
+</Project>

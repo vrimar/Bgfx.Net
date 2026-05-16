@@ -1,0 +1,51 @@
+name: ci-pr
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  managed:
+    name: Build and test managed code
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Sync bindings and regenerate
+        run: |
+          pwsh -NoProfile -File build/sync-bindings.ps1
+          pwsh -NoProfile -File build/run-generator.ps1
+
+      - name: Verify generated file is in sync with committed copy
+        run: |
+          if ! git diff --exit-code -- src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs; then
+            echo "::error::Generated bindings out of sync with submodule. Run sync-bindings.ps1 + run-generator.ps1 locally and commit."
+            git --no-pager diff -- src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs | head -100
+            exit 1
+          fi
+
+      - name: Build solution
+        run: dotnet build Bgfx.Net.sln -c Release -p:SkipNativeWarning=true
+
+      - name: Run generator tests
+        run: dotnet test tests/Bgfx.Net.Generator.Tests/Bgfx.Net.Generator.Tests.csproj -c Release --no-build
+
+      - name: Run smoke tests (no native lib loaded)
+        run: dotnet test tests/Bgfx.Net.Tests/Bgfx.Net.Tests.csproj -c Release --no-build

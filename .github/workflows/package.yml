@@ -1,0 +1,124 @@
+name: package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version (e.g., 1.142.9194.0)'
+        required: true
+        type: string
+      publish:
+        description: 'Push to NuGet.org'
+        required: true
+        type: boolean
+        default: false
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  build-native:
+    uses: ./.github/workflows/build-native.yml
+
+  pack:
+    name: dotnet pack
+    needs: build-native
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Download all native artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bgfx-shared-*
+          path: artifacts/native/
+          merge-multiple: false
+
+      - name: Download all tools artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: bgfx-tools-*
+          path: artifacts/tools/
+          merge-multiple: false
+
+      - name: Reshape artifact layout
+        run: |
+          # actions/download-artifact extracts each into a folder named after the artifact;
+          # rename to the RID-only folder structure the csproj expects.
+          set -euo pipefail
+          for src in artifacts/native/bgfx-shared-*; do
+              rid="${src#artifacts/native/bgfx-shared-}"
+              mv "$src" "artifacts/native/$rid"
+          done
+          for src in artifacts/tools/bgfx-tools-*; do
+              rid="${src#artifacts/tools/bgfx-tools-}"
+              mv "$src" "artifacts/tools/$rid"
+          done
+          # RID-agnostic shader headers — staged directly from the submodule since
+          # per-RID artifact uploads only carry the RID-specific binaries.
+          mkdir -p artifacts/tools/include
+          cp -f external/bgfx/src/bgfx_shader.sh           artifacts/tools/include/
+          cp -f external/bgfx/src/bgfx_compute.sh          artifacts/tools/include/
+          cp -f external/bgfx/examples/common/common.sh    artifacts/tools/include/
+          cp -f external/bgfx/examples/common/shaderlib.sh artifacts/tools/include/
+          find artifacts -type f
+
+      - name: Determine package version
+        id: version
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "value=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=0.0.0-ci.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Sync bindings and regenerate (for reproducibility)
+        run: |
+          pwsh -NoProfile -File build/sync-bindings.ps1
+          pwsh -NoProfile -File build/run-generator.ps1
+
+      - name: Verify generated file is in sync with committed copy
+        run: |
+          if ! git diff --exit-code -- src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs; then
+            echo "::error::Generated bindings out of sync with submodule. Run sync-bindings.ps1 + run-generator.ps1 locally and commit."
+            exit 1
+          fi
+
+      - name: Build and pack
+        run: |
+          dotnet build Bgfx.Net.sln -c Release -p:Version=${{ steps.version.outputs.value }} -p:SkipNativeWarning=true
+          dotnet pack src/Bgfx.Net/Bgfx.Net.csproj           -c Release -p:Version=${{ steps.version.outputs.value }} -o packages
+          dotnet pack src/Bgfx.Net.Tools/Bgfx.Net.Tools.csproj -c Release -p:Version=${{ steps.version.outputs.value }} -o packages
+
+      - name: Upload nupkgs
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: packages/
+
+      - name: Publish to NuGet.org
+        if: ${{ (inputs.publish == true) || startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo "::error::NUGET_API_KEY secret missing"
+            exit 1
+          fi
+          dotnet nuget push 'packages/*.nupkg' --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate

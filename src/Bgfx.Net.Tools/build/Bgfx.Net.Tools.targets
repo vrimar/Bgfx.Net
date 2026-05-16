@@ -1,0 +1,37 @@
+<Project>
+
+  <!--
+    Bgfx.Net.Tools — MSBuild integration for bgfx's shaderc/texturec/geometryc tools.
+
+    Usage:
+      <ItemGroup>
+        <BgfxShader Include="shaders/vs_*.sc" Type="vertex" Platform="windows" Profile="s_5_0" Out="$(OutDir)shaders\%(Filename).bin" />
+        <BgfxShader Include="shaders/fs_*.sc" Type="fragment" Platform="windows" Profile="s_5_0" Out="$(OutDir)shaders\%(Filename).bin" />
+      </ItemGroup>
+
+    Caveats:
+      - HLSL/DXBC compilation requires fxc.exe (Windows only). Build .sc shaders for
+        Direct3D on a Windows host.
+      - DXIL requires dxc.exe (cross-platform but distributed separately by Microsoft).
+      - GLSL/ESSL/Metal/SPIR-V targets work cross-platform.
+  -->
+
+  <Target Name="BgfxCompileShaders"
+          BeforeTargets="AssignTargetPaths"
+          Condition="'@(BgfxShader)' != ''"
+          Inputs="@(BgfxShader)"
+          Outputs="@(BgfxShader->'%(Out)')">
+
+    <Error Code="BGFXNET100" Text="shaderc not found at $(BgfxShaderC). Set BgfxShaderC or ensure Bgfx.Net.Tools is restored for host RID '$(_BgfxNetToolsHostRid)'." Condition="!Exists('$(BgfxShaderC)')" />
+
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('%(BgfxShader.Out)'))" />
+
+    <Exec Command="&quot;$(BgfxShaderC)&quot; -f &quot;%(BgfxShader.FullPath)&quot; -o &quot;%(BgfxShader.Out)&quot; --type %(BgfxShader.Type) --platform %(BgfxShader.Platform) -p %(BgfxShader.Profile) -i &quot;$(BgfxShaderIncludePath)&quot;"
+          ConsoleToMSBuild="true" />
+
+    <ItemGroup>
+      <Content Include="%(BgfxShader.Out)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+</Project>

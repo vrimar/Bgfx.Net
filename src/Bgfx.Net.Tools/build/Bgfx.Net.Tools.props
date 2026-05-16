@@ -1,0 +1,21 @@
+<Project>
+
+  <!--
+    Resolves the path to the shaderc/texturec/geometryc binaries for the BUILD HOST RID.
+    This must NOT use $(RuntimeIdentifier), which is the PUBLISH target. We need the host
+    where MSBuild is running (where shaderc.exe will execute).
+  -->
+  <PropertyGroup>
+    <_BgfxNetToolsHostRid Condition="'$(_BgfxNetToolsHostRid)' == ''">$(NETCoreSdkPortableRuntimeIdentifier)</_BgfxNetToolsHostRid>
+    <_BgfxNetToolsExeExt Condition="$([MSBuild]::IsOSPlatform('Windows'))">.exe</_BgfxNetToolsExeExt>
+    <_BgfxNetToolsRoot>$(MSBuildThisFileDirectory)..\runtimes\$(_BgfxNetToolsHostRid)\native\</_BgfxNetToolsRoot>
+
+    <BgfxShaderC   Condition="'$(BgfxShaderC)' == ''">$(_BgfxNetToolsRoot)shaderc$(_BgfxNetToolsExeExt)</BgfxShaderC>
+    <BgfxTextureC  Condition="'$(BgfxTextureC)' == ''">$(_BgfxNetToolsRoot)texturec$(_BgfxNetToolsExeExt)</BgfxTextureC>
+    <BgfxGeometryC Condition="'$(BgfxGeometryC)' == ''">$(_BgfxNetToolsRoot)geometryc$(_BgfxNetToolsExeExt)</BgfxGeometryC>
+
+    <!-- bgfx_shader.sh, bgfx_compute.sh, common.sh, shaderlib.sh — passed to shaderc as -i. -->
+    <BgfxShaderIncludePath Condition="'$(BgfxShaderIncludePath)' == ''">$(MSBuildThisFileDirectory)shaders\include\</BgfxShaderIncludePath>
+  </PropertyGroup>
+
+</Project>

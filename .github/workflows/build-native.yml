@@ -1,0 +1,87 @@
+name: build-native
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'external/bgfx/**'
+      - 'external/bx/**'
+      - 'external/bimg/**'
+      - 'build/build-native-*.sh'
+      - 'build/build-native-*.ps1'
+      - '.github/workflows/build-native.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.rid }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - rid: win-x64
+            runner: windows-2022
+            script: pwsh build/build-native-win.ps1
+          - rid: linux-x64
+            # 24.04 ships GLIBC 2.39, satisfying the GLIBC_2.38 floor of bx's
+            # prebuilt genie binary. 22.04 (GLIBC 2.35) cannot load it.
+            runner: ubuntu-24.04
+            script: bash build/build-native-unix.sh linux-x64
+            apt: 'libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev'
+          # linux-arm64 is deferred — bx's linux-gcc x64 toolchain config
+          # bakes in -m64/-msse4.2/-mfpmath=sse which arm64 gcc rejects, and
+          # bx has no native linux-arm64-gcc action. Re-enable once we
+          # either upstream a linux-arm64 action to bx or maintain a patch.
+          # See build/build-native-unix.sh — the linux-arm64 case + GENie
+          # from-source scaffolding remain in place for that work.
+          - rid: osx-x64
+            runner: macos-14
+            script: bash build/build-native-unix.sh osx-x64
+          - rid: osx-arm64
+            runner: macos-14
+            script: bash build/build-native-unix.sh osx-arm64
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Linux build dependencies
+        if: matrix.apt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.apt }}
+
+      - name: Set up MSVC (Windows)
+        if: matrix.rid == 'win-x64'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build native + tools (${{ matrix.rid }})
+        shell: bash
+        run: ${{ matrix.script }}
+
+      - name: Upload bgfx shared library
+        uses: actions/upload-artifact@v4
+        with:
+          name: bgfx-shared-${{ matrix.rid }}
+          path: artifacts/native/${{ matrix.rid }}/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: bgfx-tools-${{ matrix.rid }}
+          path: artifacts/tools/${{ matrix.rid }}/
+          if-no-files-found: error
+          retention-days: 14
