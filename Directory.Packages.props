@@ -15,6 +15,8 @@
     <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
     <PackageVersion Include="Xunit.SkippableFact" Version="1.5.23" />
     <PackageVersion Include="Verify.Xunit" Version="26.6.0" />
+
+    <PackageVersion Include="Silk.NET.SDL" Version="2.22.0" />
   </ItemGroup>
 
 </Project>
