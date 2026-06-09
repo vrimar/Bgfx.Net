@@ -2,10 +2,6 @@ name: sync-upstream
 
 on:
   workflow_dispatch:
-  schedule:
-    # Mondays 08:00 UTC. bgfx commits multiple times per day; weekly rollup
-    # gives one tidy PR with a `git log --oneline` of what changed.
-    - cron: '0 8 * * MON'
 
 permissions:
   contents: write

@@ -27,5 +27,7 @@ external/bimg/.build/
 # Native artifacts staging
 native-artifacts/
 
+.claude
+
 # Generated, but committed: bgfx.raw.cs and bgfx.g.cs are tracked
 # (do not exclude them here — only the IDE/build noise above)
