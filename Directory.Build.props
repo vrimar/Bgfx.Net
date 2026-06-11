@@ -13,6 +13,11 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
+    <!-- Wrapper SemVer, independent of the bgfx revision (see RELEASING.md). The
+         release workflow overrides this via -p:Version. Tracks the next unreleased
+         version: 0.1.0 is published; BgfxBuildInfo adds public API -> 0.2.0. -->
+    <VersionPrefix>0.2.0</VersionPrefix>
+
     <Authors>Bgfx.Net contributors</Authors>
     <Company>Bgfx.Net</Company>
     <Copyright>Copyright (c) Bgfx.Net contributors</Copyright>
@@ -21,6 +26,15 @@
     <RepositoryUrl>https://github.com/vrimar/Bgfx.Net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- Surface the bundled bgfx API version on the gallery page. defines.h in the
+       submodule is the single source of truth; BgfxBuildInfo exposes it in code. -->
+  <PropertyGroup>
+    <BgfxDefinesPath>$(MSBuildThisFileDirectory)external\bgfx\include\bgfx\defines.h</BgfxDefinesPath>
+    <_BgfxDefinesText Condition="Exists('$(BgfxDefinesPath)')">$([System.IO.File]::ReadAllText('$(BgfxDefinesPath)'))</_BgfxDefinesText>
+    <BgfxApiVersion Condition="'$(_BgfxDefinesText)' != ''">$([System.Text.RegularExpressions.Regex]::Match($(_BgfxDefinesText), 'BGFX_API_VERSION\s+UINT32_C\((\d+)\)').Groups[1].Value)</BgfxApiVersion>
+    <PackageReleaseNotes Condition="'$(PackageReleaseNotes)' == '' and '$(BgfxApiVersion)' != ''">Bundles bgfx API v$(BgfxApiVersion). Exact upstream commit recorded in assembly metadata (BgfxRevision).</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

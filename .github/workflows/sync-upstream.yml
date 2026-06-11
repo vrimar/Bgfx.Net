@@ -27,15 +27,30 @@ jobs:
       - name: Record previous SHAs
         id: prev
         run: |
+          api() { sed -n 's/.*BGFX_API_VERSION[[:space:]]*UINT32_C(\([0-9]*\)).*/\1/p' external/bgfx/include/bgfx/defines.h; }
           {
             echo "bgfx=$(git -C external/bgfx rev-parse HEAD)"
             echo "bx=$(git -C external/bx rev-parse HEAD)"
             echo "bimg=$(git -C external/bimg rev-parse HEAD)"
+            echo "bgfx_api=$(api)"
           } >> "$GITHUB_OUTPUT"
 
       - name: Update submodules to latest origin
         run: |
           git submodule update --remote --merge external/bgfx external/bx external/bimg
+
+      - name: Record new bgfx API version
+        id: new
+        env:
+          PREV_API: ${{ steps.prev.outputs.bgfx_api }}
+        run: |
+          new_api=$(sed -n 's/.*BGFX_API_VERSION[[:space:]]*UINT32_C(\([0-9]*\)).*/\1/p' external/bgfx/include/bgfx/defines.h)
+          echo "bgfx_api=$new_api" >> "$GITHUB_OUTPUT"
+          if [ "$new_api" != "$PREV_API" ]; then
+            echo "guidance=:warning: BGFX_API_VERSION changed ($PREV_API -> $new_api) — bump at least a MINOR (MAJOR if ABI-breaking). See RELEASING.md." >> "$GITHUB_OUTPUT"
+          else
+            echo "guidance=BGFX_API_VERSION unchanged ($new_api) — a PATCH/MINOR per wrapper changes is sufficient." >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Show upstream changes
         env:
@@ -77,6 +92,11 @@ jobs:
             - bgfx: `${{ steps.prev.outputs.bgfx }}` -> new HEAD
             - bx:   `${{ steps.prev.outputs.bx }}`   -> new HEAD
             - bimg: `${{ steps.prev.outputs.bimg }}` -> new HEAD
+            - bgfx `BGFX_API_VERSION`: `${{ steps.prev.outputs.bgfx_api }}` -> `${{ steps.new.outputs.bgfx_api }}`
+
+            ## Versioning
+
+            ${{ steps.new.outputs.guidance }}
 
             See workflow run output for `git log` since the previous pin.
             Reviewer: audit `bgfx.g.cs` for renamed/removed signatures that may

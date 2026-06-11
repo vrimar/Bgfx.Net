@@ -63,8 +63,11 @@ dotnet build Bgfx.Net.sln
 - **Threading**: bgfx uses an API thread + render thread model selected at `Init`.
   See bgfx's docs for the threading contract.
 - **Pinned to a specific bgfx revision**: The `Bgfx.Net` assembly is built against
-  exactly one bgfx commit (recorded as assembly metadata). Mixing it with a
-  different `bgfx.dll` at runtime is unsupported.
+  exactly one bgfx commit. Read the pin at runtime via `Bgfx.Net.BgfxBuildInfo.ApiVersion`
+  and `.Revision` (also embedded as `BgfxApiVersion` / `BgfxRevision` assembly
+  metadata). The package version itself is independent wrapper SemVer, not the bgfx
+  revision — see [RELEASING.md](RELEASING.md). Mixing the assembly with a different
+  `bgfx.dll` at runtime is unsupported.
 
 ## License
 

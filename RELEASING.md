@@ -5,28 +5,48 @@ How to ship a release of `Bgfx.Net` and `Bgfx.Net.Tools` to NuGet.org.
 ## Versioning policy
 
 Bgfx.Net uses **independent [Semantic Versioning](https://semver.org/)** — the
-package version reflects the *wrapper's* API contract, not the bgfx revision it
-embeds. Each release records the bgfx pin in the release notes (see below).
+package version tracks the *wrapper's* managed API, not the bgfx revision it embeds.
+bgfx is a versionless, rolling-release library (no upstream tags), so embedding its
+revision in our version number is meaningless; instead the bgfx pin travels as
+**metadata** (see below). This is the same approach SkiaSharp (rolling Skia) and
+`sharp` (libvips) take.
 
-- **0.x.y** — pre-stable. Anything may break between minors. We're here until
-  the API surface settles.
-- **MAJOR** bumps signal a breaking change to managed API or a binary-incompatible
-  bgfx upgrade.
-- **MINOR** bumps add features or non-breaking bgfx upgrades.
-- **PATCH** bumps are bug fixes only — no API changes, no bgfx revision change.
+The wrapper owns all three version components:
+
+| Change | Bump |
+|---|---|
+| Breaking managed API change (rename/remove/signature) | **MAJOR** |
+| Binary-incompatible bgfx upgrade (ABI break), even if the managed API is unchanged | **MAJOR** |
+| New binding feature — extension method, Span overload, helper | **MINOR** |
+| Non-breaking bgfx upgrade bundled with no managed API change | **MINOR** |
+| Bug fix, no API change | **PATCH** |
+
+- **0.x.y** — pre-stable. While we're below 1.0 the managed API hasn't settled, so
+  breaking changes ride a MINOR (standard SemVer pre-1.0 convention). Promote to
+  `1.0.0` as a deliberate, one-time event once the surface stabilizes.
+- The ABI-break rule is the *only* place bgfx vetoes our number: a bgfx upgrade that
+  breaks binary compatibility forces a MAJOR even if our C# didn't change, because
+  consumers' compiled code is affected.
 
 Pre-release suffixes use the `-alpha.N` / `-beta.N` / `-rc.N` convention
-(e.g. `v0.2.0-rc.1`). The NuGet workflow accepts any tag matching `v*`.
+(e.g. `v0.2.0-rc.1`). The NuGet workflow accepts any tag matching `v*` and fails the
+build if the resolved version isn't valid SemVer.
 
 ### Recording the bgfx pin
 
-Every release ships against exactly one bgfx commit. The release notes for each
-tag must state:
+Every release ships against exactly one bgfx commit. The pin is captured
+**automatically** by `build/sync-bindings.ps1` from the submodule — no manual
+`defines.h` lookup — and surfaced three ways:
 
-- bgfx submodule SHA (from `git -C external/bgfx rev-parse HEAD`)
-- bgfx `BGFX_API_VERSION` (from `external/bgfx/include/bgfx/defines.h`)
+- `AssemblyMetadata("BgfxRevision", "<sha>")` and `AssemblyMetadata("BgfxApiVersion", "<n>")`
+  in [src/Bgfx.Net/AssemblyInfo.cs](src/Bgfx.Net/AssemblyInfo.cs).
+- Public constants `Bgfx.Net.BgfxBuildInfo.Revision` / `.ApiVersion` (AOT-friendly,
+  no reflection) in the generated `BgfxBuildInfo.g.cs`.
+- The package's `<PackageReleaseNotes>`, auto-filled from `BGFX_API_VERSION` at pack
+  time, so the gallery page always states the bundled API version.
 
-This is what consumers use to map "which bgfx is in this package".
+When writing the GitHub Release notes, copy these already-captured values through
+(SHA + `BGFX_API_VERSION`); you don't need to look them up by hand.
 
 ## Release flow (tag-driven)
 

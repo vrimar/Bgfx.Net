@@ -33,11 +33,12 @@ jobs:
           pwsh -NoProfile -File build/sync-bindings.ps1
           pwsh -NoProfile -File build/run-generator.ps1
 
-      - name: Verify generated file is in sync with committed copy
+      - name: Verify generated files and bgfx pin are in sync with submodule
         run: |
-          if ! git diff --exit-code -- src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs; then
-            echo "::error::Generated bindings out of sync with submodule. Run sync-bindings.ps1 + run-generator.ps1 locally and commit."
-            git --no-pager diff -- src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs | head -100
+          paths='src/Bgfx.Net/Generated/bgfx.g.cs src/Bgfx.Net/Generated/bgfx.raw.cs src/Bgfx.Net/Generated/BgfxBuildInfo.g.cs src/Bgfx.Net/AssemblyInfo.cs'
+          if ! git diff --exit-code -- $paths; then
+            echo "::error::Generated bindings or bgfx pin out of sync with submodule. Run sync-bindings.ps1 + run-generator.ps1 locally and commit."
+            git --no-pager diff -- $paths | head -100
             exit 1
           fi
 

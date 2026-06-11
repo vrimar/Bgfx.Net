@@ -18,6 +18,18 @@ public unsafe class SmokeTests
     }
 
     [Fact]
+    public void BgfxBuildInfoMatchesAssemblyMetadata()
+    {
+        var meta = typeof(ShaderHandle).Assembly
+            .GetCustomAttributes<AssemblyMetadataAttribute>()
+            .ToDictionary(a => a.Key, a => a.Value);
+
+        Assert.True(BgfxBuildInfo.ApiVersion > 0);
+        Assert.Equal(BgfxBuildInfo.ApiVersion.ToString(), meta["BgfxApiVersion"]);
+        Assert.Equal(BgfxBuildInfo.Revision, meta["BgfxRevision"]);
+    }
+
+    [Fact]
     public void HandleStructsExposeValid()
     {
         var invalid = new ShaderHandle(ushort.MaxValue);
