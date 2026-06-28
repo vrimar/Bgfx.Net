@@ -34,24 +34,25 @@ Bgfx.Shutdown();
 
 This repository uses git submodules for `bgfx`, `bx`, and `bimg`:
 
-```pwsh
+```sh
 git clone --recurse-submodules https://github.com/$USER/Bgfx.Net.git
 # or, after a normal clone:
 git submodule update --init --recursive
 # or use the helper:
-./build/bootstrap.ps1
+./build/bootstrap.sh
 ```
 
 ## Building locally
 
-Prerequisites: .NET SDK 10, PowerShell 7, plus a C++ toolchain for your platform
-(MSVC on Windows, gcc/clang on Linux, Xcode CLT on macOS).
+Prerequisites: .NET SDK 10, plus a C++ toolchain for your platform
+(MSVC on Windows, gcc/clang on Linux, Xcode CLT on macOS). On Windows the native
+build still uses PowerShell (`build-native-win.ps1`).
 
-```pwsh
-./build/bootstrap.ps1            # init submodules, fetch genie
-./build/build-native-win.ps1     # or build-native-unix.sh on Linux/macOS
-./build/sync-bindings.ps1        # copies bgfx.cs into src/Bgfx.Net/Generated/
-./build/run-generator.ps1        # produces bgfx.g.cs
+```sh
+./build/bootstrap.sh             # init submodules, fetch genie
+./build/build-native-unix.sh     # or build-native-win.ps1 on Windows
+./build/sync-bindings.sh         # copies bgfx.cs into src/Bgfx.Net/Generated/
+./build/run-generator.sh         # produces bgfx.g.cs
 dotnet build Bgfx.Net.sln
 ```
 

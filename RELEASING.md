@@ -35,7 +35,7 @@ build if the resolved version isn't valid SemVer.
 ### Recording the bgfx pin
 
 Every release ships against exactly one bgfx commit. The pin is captured
-**automatically** by `build/sync-bindings.ps1` from the submodule — no manual
+**automatically** by `build/sync-bindings.sh` from the submodule — no manual
 `defines.h` lookup — and surfaced three ways:
 
 - `AssemblyMetadata("BgfxRevision", "<sha>")` and `AssemblyMetadata("BgfxApiVersion", "<n>")`
@@ -61,7 +61,7 @@ packages, and pushes to NuGet.org with `--skip-duplicate`.
 - `main` is green on CI.
 - Generated bindings (`src/Bgfx.Net/Generated/bgfx.g.cs`, `bgfx.raw.cs`) are
   committed and in sync with the submodule. The workflow fails the build if
-  they've drifted — re-run `build/sync-bindings.ps1` + `build/run-generator.ps1`
+  they've drifted — re-run `build/sync-bindings.sh` + `build/run-generator.sh`
   and commit if so.
 
 ### Steps
@@ -105,7 +105,7 @@ dotnet pack src/Bgfx.Net.Tools/Bgfx.Net.Tools.csproj -c Release -p:Version=0.1.0
 A bgfx update is a release-worthy event. Procedure:
 
 1. `git -C external/bgfx fetch && git -C external/bgfx checkout <new-sha>`
-2. Run `build/sync-bindings.ps1` and `build/run-generator.ps1`.
+2. Run `build/sync-bindings.sh` and `build/run-generator.sh`.
 3. Build natives locally and run the test suite.
 4. Commit submodule bump + regenerated bindings together.
 5. Release a new MINOR (or MAJOR if the bgfx API broke binary compat).

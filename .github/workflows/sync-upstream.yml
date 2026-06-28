@@ -67,8 +67,8 @@ jobs:
 
       - name: Regenerate bindings
         run: |
-          pwsh -NoProfile -File build/sync-bindings.ps1
-          pwsh -NoProfile -File build/run-generator.ps1
+          bash build/sync-bindings.sh
+          bash build/run-generator.sh
 
       - name: Build to confirm bindings still compile
         run: dotnet build Bgfx.Net.sln -c Release -p:SkipNativeWarning=true
