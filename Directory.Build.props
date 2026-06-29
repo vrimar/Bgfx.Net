@@ -13,11 +13,6 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
 
-    <!-- Wrapper SemVer, independent of the bgfx revision (see RELEASING.md). The
-         release workflow overrides this via -p:Version. Tracks the next unreleased
-         version: 0.1.0 is published; BgfxBuildInfo adds public API -> 0.2.0. -->
-    <VersionPrefix>0.2.0</VersionPrefix>
-
     <Authors>Bgfx.Net contributors</Authors>
     <Company>Bgfx.Net</Company>
     <Copyright>Copyright (c) Bgfx.Net contributors</Copyright>
