@@ -74,7 +74,7 @@ packages, and pushes to NuGet.org with `--skip-duplicate`.
    git push origin v0.1.0
    ```
 3. Watch the workflow run under Actions → **package**. It will:
-   - Build native `bgfx` + tools for all five RIDs.
+   - Build native `bgfx` for all RIDs (plus shader tools for the desktop RIDs).
    - Verify generated bindings match the submodule.
    - Pack `Bgfx.Net` and `Bgfx.Net.Tools`.
    - Push to NuGet.org.

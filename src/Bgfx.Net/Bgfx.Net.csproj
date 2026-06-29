@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>Bgfx.Net</PackageId>
-    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, linux-x64, osx-x64, and osx-arm64.</Description>
+    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, linux-x64, osx-x64, osx-arm64, android-arm64, and android-x64.</Description>
     <PackageTags>bgfx;graphics;rendering;vulkan;metal;directx;opengl;native</PackageTags>
 
     <IsAotCompatible>true</IsAotCompatible>
@@ -34,6 +34,8 @@
     <None Include="$(NativeArtifactsDir)linux-arm64\libbgfx.so"    Pack="true" PackagePath="runtimes\linux-arm64\native\libbgfx.so"    Condition="Exists('$(NativeArtifactsDir)linux-arm64\libbgfx.so')" />
     <None Include="$(NativeArtifactsDir)osx-x64\libbgfx.dylib"     Pack="true" PackagePath="runtimes\osx-x64\native\libbgfx.dylib"     Condition="Exists('$(NativeArtifactsDir)osx-x64\libbgfx.dylib')" />
     <None Include="$(NativeArtifactsDir)osx-arm64\libbgfx.dylib"   Pack="true" PackagePath="runtimes\osx-arm64\native\libbgfx.dylib"   Condition="Exists('$(NativeArtifactsDir)osx-arm64\libbgfx.dylib')" />
+    <None Include="$(NativeArtifactsDir)android-arm64\libbgfx.so"  Pack="true" PackagePath="runtimes\android-arm64\native\libbgfx.so"  Condition="Exists('$(NativeArtifactsDir)android-arm64\libbgfx.so')" />
+    <None Include="$(NativeArtifactsDir)android-x64\libbgfx.so"    Pack="true" PackagePath="runtimes\android-x64\native\libbgfx.so"    Condition="Exists('$(NativeArtifactsDir)android-x64\libbgfx.so')" />
   </ItemGroup>
 
   <Target Name="WarnIfNoNatives" BeforeTargets="Pack" Condition="'$(SkipNativeWarning)' != 'true'">

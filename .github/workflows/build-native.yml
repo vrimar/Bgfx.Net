@@ -49,6 +49,14 @@ jobs:
           - rid: osx-arm64
             runner: macos-14
             script: bash build/build-native-unix.sh osx-arm64
+          - rid: android-arm64
+            runner: ubuntu-24.04
+            script: bash build/build-native-android.sh android-arm64
+            apt: 'patchelf'
+          - rid: android-x64
+            runner: ubuntu-24.04
+            script: bash build/build-native-android.sh android-x64
+            apt: 'patchelf'
 
     steps:
       - name: Checkout (with submodules)
@@ -66,6 +74,10 @@ jobs:
         if: matrix.rid == 'win-x64'
         uses: microsoft/setup-msbuild@v2
 
+      - name: Pin Android NDK
+        if: startsWith(matrix.rid, 'android')
+        run: echo "ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+
       - name: Build native + tools (${{ matrix.rid }})
         shell: bash
         run: ${{ matrix.script }}
@@ -79,6 +91,7 @@ jobs:
           retention-days: 14
 
       - name: Upload tools
+        if: ${{ !startsWith(matrix.rid, 'android') }}
         uses: actions/upload-artifact@v4
         with:
           name: bgfx-tools-${{ matrix.rid }}

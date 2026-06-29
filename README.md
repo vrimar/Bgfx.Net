@@ -1,8 +1,8 @@
 # Bgfx.Net
 
 Cross-platform .NET bindings for [bgfx](https://github.com/bkaradzic/bgfx), a graphics
-rendering library that runs on Windows, Linux, and macOS with Direct3D, Vulkan, OpenGL,
-and Metal backends.
+rendering library that runs on Windows, Linux, macOS, and Android with Direct3D, Vulkan,
+OpenGL, OpenGL ES, and Metal backends.
 
 ## Packages
 
@@ -11,8 +11,19 @@ and Metal backends.
 | `Bgfx.Net` | Managed bindings + native `bgfx` shared library for all supported RIDs |
 | `Bgfx.Net.Tools` | MSBuild integration that runs `shaderc` / `texturec` / `geometryc` at build time. Marked `developmentDependency`, so it doesn't propagate into consumer output. |
 
-Supported RIDs in v1: `win-x64`, `linux-x64`, `osx-x64`, `osx-arm64`. (`linux-arm64`
-is planned — blocked on upstream bx adding a native `linux-arm64-gcc` action.)
+Supported RIDs: `win-x64`, `linux-x64`, `osx-x64`, `osx-arm64`, `android-arm64`,
+`android-x64`. (`linux-arm64` is planned — blocked on upstream bx adding a native
+`linux-arm64-gcc` action.)
+
+On Android the native `libbgfx.so` is shipped under `runtimes/android-arm64/native`
+and `runtimes/android-x64/native`; a `net*-android` app that references the package
+gets it bundled into the APK automatically. Two consumer-side notes:
+
+- The app's effective Android `<RuntimeIdentifiers>` must include the ABIs you want
+  bundled — Release builds often resolve only `android-arm64`, so add `android-x64`
+  if you also need the x86_64 emulator.
+- Supply bgfx the native window: set `PlatformData.Nwh` to the `ANativeWindow*`
+  obtained from the Java `Surface` via JNI/NDK before `Init`.
 
 ## Quick start
 
@@ -46,7 +57,9 @@ git submodule update --init --recursive
 
 Prerequisites: .NET SDK 10, plus a C++ toolchain for your platform
 (MSVC on Windows, gcc/clang on Linux, Xcode CLT on macOS). On Windows the native
-build still uses PowerShell (`build-native-win.ps1`).
+build still uses PowerShell (`build-native-win.ps1`). To cross-build the Android
+native lib, install an NDK and run `build-native-android.sh android-arm64`
+(or `android-x64`) with `ANDROID_NDK_ROOT` set.
 
 ```sh
 ./build/bootstrap.sh             # init submodules, fetch genie
