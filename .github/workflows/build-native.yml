@@ -43,11 +43,13 @@ jobs:
           # either upstream a linux-arm64 action to bx or maintain a patch.
           # See build/build-native-unix.sh — the linux-arm64 case + GENie
           # from-source scaffolding remain in place for that work.
+          # macos-15 for Xcode 16 (AppleClang 16): the updated bgfx/Dawn Tint uses
+          # an overloaded{} std::visit CTAD that AppleClang 15.4 (macos-14) rejects.
           - rid: osx-x64
-            runner: macos-14
+            runner: macos-15
             script: bash build/build-native-unix.sh osx-x64
           - rid: osx-arm64
-            runner: macos-14
+            runner: macos-15
             script: bash build/build-native-unix.sh osx-arm64
           - rid: android-arm64
             runner: ubuntu-24.04
