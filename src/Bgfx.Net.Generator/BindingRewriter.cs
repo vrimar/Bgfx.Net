@@ -19,6 +19,7 @@ internal static class BindingRewriter
         var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
         var root = (CompilationUnitSyntax)tree.GetRoot();
 
+        root = (CompilationUnitSyntax)new StdIntTypeRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new NamespaceRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new ClassNameRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new NestedTypeHoistRewriter().Visit(root)!;

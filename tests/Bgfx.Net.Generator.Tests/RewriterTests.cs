@@ -162,6 +162,22 @@ public class RewriterTests
     }
 
     [Fact]
+    public void StdIntAliasesAreMappedToCSharpPredefinedTypes()
+    {
+        // Upstream's video decoder structs leak raw C99 `uint8_t*`, which isn't a C# type.
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    public unsafe struct VideoDecoderInit { public uint8_t* parameterSets; }
+                }
+            }
+            """;
+        var output = BindingRewriter.Rewrite(input);
+        Assert.Contains("byte* ParameterSets;", output);
+        Assert.DoesNotContain("uint8_t", output);
+    }
+
+    [Fact]
     public void HandleStructFieldsArePreservedLowercase()
     {
         // The handle's `idx` field must stay lowercase because the generator's emitted
