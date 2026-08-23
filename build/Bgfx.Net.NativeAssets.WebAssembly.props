@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!--
+    Ships under buildTransitive/netstandard1.0/ so it reaches consumers through
+    a package reference. Archives sit alongside in bgfx.a/<emscripten-version>/,
+    keyed by version because wasm objects only link against a .NET runtime pack
+    built with the same emsdk.
+
+    The archives are named without a lib prefix on purpose: the wasm pinvoke
+    table matches [DllImport("bgfx")] against the archive's file stem.
+  -->
+  <PropertyGroup>
+    <BgfxStaticLibraryPath>$(MSBuildThisFileDirectory)bgfx.a</BgfxStaticLibraryPath>
+    <BgfxEmscriptenVersion Condition="'$(BgfxEmscriptenVersion)' == ''">3.1.56</BgfxEmscriptenVersion>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <BgfxStaticLibrary Include="$(BgfxStaticLibraryPath)/$(BgfxEmscriptenVersion)/*.a" />
+    <NativeFileReference Include="@(BgfxStaticLibrary)" />
+  </ItemGroup>
+
+  <!--
+    WebGL2 is the only backend bgfx can drive in a browser, and emscripten links
+    WebGL1 unless raised — without this the GLES3 entry points are undefined.
+  -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'browser-wasm'">
+    <EmccExtraLDFlags>$(EmccExtraLDFlags) -sMAX_WEBGL_VERSION=2 -sMIN_WEBGL_VERSION=2</EmccExtraLDFlags>
+  </PropertyGroup>
+
+</Project>
