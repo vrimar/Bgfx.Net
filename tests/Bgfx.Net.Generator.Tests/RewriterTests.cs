@@ -142,11 +142,30 @@ public class RewriterTests
         var output = BindingRewriter.Rewrite(input);
         Assert.Contains("readonly partial struct ShaderHandle", output);
         Assert.Contains("readonly ushort idx", output);
-        Assert.Contains("public ShaderHandle(ushort idx)", output);
+        Assert.Contains("public ShaderHandle(ushort idx) { this.idx = idx; }", output);
     }
 
     [Fact]
-    public void MultiFieldHandleStructsGetAConstructorCoveringEveryField()
+    public void HandleStructsGetValueEquality()
+    {
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    public struct ShaderHandle { public ushort idx; }
+                }
+            }
+            """;
+        var output = BindingRewriter.Rewrite(input);
+        Assert.Contains("struct ShaderHandle : IEquatable<ShaderHandle>", output);
+        Assert.Contains("public bool Equals(ShaderHandle other) => idx == other.idx;", output);
+        Assert.Contains("public override bool Equals(object? obj) => obj is ShaderHandle other && Equals(other);", output);
+        Assert.Contains("public override int GetHashCode() => HashCode.Combine(idx);", output);
+        Assert.Contains("public static bool operator ==(ShaderHandle left, ShaderHandle right)", output);
+        Assert.Contains("public static bool operator !=(ShaderHandle left, ShaderHandle right)", output);
+    }
+
+    [Fact]
+    public void MultiFieldHandleStructsCoverEveryFieldInConstructorAndEquality()
     {
         var input = """
             namespace Bgfx {
@@ -159,6 +178,22 @@ public class RewriterTests
         Assert.Contains("readonly ushort idx", output);
         Assert.Contains("readonly ushort Type", output);
         Assert.Contains("public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.Type = type; }", output);
+        Assert.Contains("public bool Equals(BufferHandle other) => idx == other.idx && Type == other.Type;", output);
+        Assert.Contains("public override int GetHashCode() => HashCode.Combine(idx, Type);", output);
+    }
+
+    [Fact]
+    public void HandleStructsWithAnUnsupportedFieldShapeFailLoudly()
+    {
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    public unsafe struct WeirdHandle { public ushort idx; public fixed uint tags[4]; }
+                }
+            }
+            """;
+        var ex = Assert.Throws<InvalidOperationException>(() => BindingRewriter.Rewrite(input));
+        Assert.Contains("WeirdHandle", ex.Message);
     }
 
     [Fact]
