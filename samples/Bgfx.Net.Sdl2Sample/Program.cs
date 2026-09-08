@@ -46,17 +46,13 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
 
     try
     {
-        var platformData = default(PlatformData);
-        FillPlatformData(sdl, window, ref platformData);
-        BgfxApi.SetPlatformData(&platformData);
-
         var init = default(Init);
         BgfxApi.InitCtor(&init);
         if (rendererOverride is { } t) init.Type = t;
-        init.PlatformData = platformData;
-        init.Resolution.Width = Width;
-        init.Resolution.Height = Height;
-        init.Resolution.Reset = (uint)ResetFlags.Vsync;
+        FillNativeHandles(sdl, window, ref init);
+        init.SwapChain.Width = Width;
+        init.SwapChain.Height = Height;
+        init.Reset = (uint)ResetFlags.Vsync;
 
         if (!BgfxApi.Init(&init))
         {
@@ -67,7 +63,7 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
         {
             Console.WriteLine($"bgfx renderer: {BgfxApi.GetRendererType()}");
 
-            BgfxApi.SetDebug((uint)DebugFlags.Text);
+            BgfxApi.SetDebug((uint)DebugFlags.Text, new FrameBufferHandle(ushort.MaxValue), 0);
             BgfxApi.SetViewClear(0, (ushort)(ClearFlags.Color | ClearFlags.Depth), 0x303080ff, 1.0f, 0);
             BgfxApi.SetViewRect(0, 0, 0, Width, Height);
 
@@ -90,7 +86,11 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
                     {
                         currentW = (uint)ev.Window.Data1;
                         currentH = (uint)ev.Window.Data2;
-                        BgfxApi.Reset(currentW, currentH, (uint)ResetFlags.Vsync, init.Resolution.FormatColor);
+                        // default(SwapChain) is not neutral; InitCtor's values are.
+                        var swapChain = init.SwapChain;
+                        swapChain.Width = currentW;
+                        swapChain.Height = currentH;
+                        BgfxApi.Reset((uint)ResetFlags.Vsync, &swapChain);
                         BgfxApi.SetViewRect(0, 0, 0, (ushort)currentW, (ushort)currentH);
                     }
                 }
@@ -138,7 +138,7 @@ static (RendererType? Renderer, int MaxFrames) ParseArgs(string[] args)
     return (renderer, maxFrames);
 }
 
-static unsafe void FillPlatformData(Sdl sdl, Window* window, ref PlatformData data)
+static unsafe void FillNativeHandles(Sdl sdl, Window* window, ref Init init)
 {
     var info = default(SysWMInfo);
     sdl.GetVersion(&info.Version);
@@ -149,11 +149,11 @@ static unsafe void FillPlatformData(Sdl sdl, Window* window, ref PlatformData da
 
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
-        data.Nwh = (void*)info.Info.Win.Hwnd;
+        init.SwapChain.Nwh = (void*)info.Info.Win.Hwnd;
     }
     else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
     {
-        data.Nwh = (void*)info.Info.Cocoa.Window;
+        init.SwapChain.Nwh = (void*)info.Info.Cocoa.Window;
     }
     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     {
@@ -161,15 +161,15 @@ static unsafe void FillPlatformData(Sdl sdl, Window* window, ref PlatformData da
         // backend it actually used via info.Subsystem.
         if (info.Subsystem == SysWMType.Wayland)
         {
-            data.Ndt = (void*)info.Info.Wayland.Display;
-            data.Nwh = (void*)info.Info.Wayland.Surface;
-            data.Type = NativeWindowHandleType.Wayland;
+            init.SwapChain.Ndt = (void*)info.Info.Wayland.Display;
+            init.SwapChain.Nwh = (void*)info.Info.Wayland.Surface;
+            init.PlatformData.Type = NativeWindowHandleType.Wayland;
         }
         else
         {
-            data.Ndt = (void*)info.Info.X11.Display;
-            data.Nwh = (void*)info.Info.X11.Window;
-            data.Type = NativeWindowHandleType.Default;
+            init.SwapChain.Ndt = (void*)info.Info.X11.Display;
+            init.SwapChain.Nwh = (void*)info.Info.X11.Window;
+            init.PlatformData.Type = NativeWindowHandleType.Default;
         }
     }
     else

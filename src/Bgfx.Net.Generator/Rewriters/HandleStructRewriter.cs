@@ -5,10 +5,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Bgfx.Net.Generator;
 
 /// <summary>
-/// Promotes handle structs to <c>public readonly partial struct</c> with a
-/// <c>public readonly ushort idx</c> field and a <c>public XHandle(ushort idx)</c>
-/// constructor. Callers consume handles returned from bgfx by value and read
-/// <c>idx</c> if they need it, but cannot mutate post-construction. The
+/// Promotes handle structs to <c>public readonly partial struct</c>, marks every
+/// instance field <c>readonly</c>, and adds a constructor taking one parameter per
+/// field in declaration order. Callers consume handles returned from bgfx by value
+/// and read the fields if they need them, but cannot mutate post-construction. The
 /// constructor exists so tests and advanced users can synthesise a specific
 /// handle value (e.g. <c>new ShaderHandle(ushort.MaxValue)</c>).
 /// The existing <c>Valid</c> property emitted by upstream is preserved.
@@ -38,12 +38,15 @@ internal sealed class HandleStructRewriter : CSharpSyntaxRewriter
 
         var newMembers = SyntaxFactory.List<MemberDeclarationSyntax>();
         var hasCtor = node.Members.OfType<ConstructorDeclarationSyntax>().Any();
+        var fields = new List<(string Type, string Name)>();
 
         foreach (var member in node.Members)
         {
-            if (member is FieldDeclarationSyntax field &&
-                field.Declaration.Variables.Any(v => v.Identifier.ValueText == "idx"))
+            if (member is FieldDeclarationSyntax field && IsInstanceField(field))
             {
+                var type = field.Declaration.Type.ToString();
+                fields.AddRange(field.Declaration.Variables.Select(v => (type, v.Identifier.ValueText)));
+
                 var newModifiers = SyntaxFactory.TokenList(
                     field.Modifiers
                         .Where(m => !m.IsKind(SyntaxKind.ReadOnlyKeyword))
@@ -56,19 +59,24 @@ internal sealed class HandleStructRewriter : CSharpSyntaxRewriter
             }
         }
 
-        if (!hasCtor)
+        if (!hasCtor && fields.Count > 0)
         {
-            // Parse the ctor as source text so trivia (spaces) come out right; building it
-            // token-by-token with SyntaxFactory leaves "publicXHandle" missing the keyword
-            // separator.
-            var ctorSource = $"public {name}(ushort idx) => this.idx = idx;";
-            var parsedCtor = (ConstructorDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(ctorSource)!;
-            parsedCtor = parsedCtor
+            var parameters = string.Join(", ", fields.Select(f => $"{f.Type} {f.Name}"));
+            var assignments = string.Join(" ", fields.Select(f => $"this.{f.Name} = {f.Name};"));
+            // SyntaxFactory-built members lose keyword separators ("publicXHandle").
+            var parsedCtor = (ConstructorDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(
+                $"public {name}({parameters}) {{ {assignments} }}")!;
+            newMembers = newMembers.Add(parsedCtor
                 .WithLeadingTrivia(SyntaxFactory.Whitespace("    "))
-                .WithTrailingTrivia(SyntaxFactory.EndOfLine("\n"));
-            newMembers = newMembers.Add(parsedCtor);
+                .WithTrailingTrivia(SyntaxFactory.EndOfLine("\n")));
         }
 
         return node.WithModifiers(modifiers).WithMembers(newMembers);
+    }
+
+    private static bool IsInstanceField(FieldDeclarationSyntax field)
+    {
+        return !field.Modifiers.Any(SyntaxKind.StaticKeyword)
+            && !field.Modifiers.Any(SyntaxKind.ConstKeyword);
     }
 }

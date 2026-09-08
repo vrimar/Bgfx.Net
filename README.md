@@ -22,7 +22,7 @@ gets it bundled into the APK automatically. Two consumer-side notes:
 - The app's effective Android `<RuntimeIdentifiers>` must include the ABIs you want
   bundled — Release builds often resolve only `android-arm64`, so add `android-x64`
   if you also need the x86_64 emulator.
-- Supply bgfx the native window: set `PlatformData.Nwh` to the `ANativeWindow*`
+- Supply bgfx the native window: set `Init.SwapChain.Nwh` to the `ANativeWindow*`
   obtained from the Java `Surface` via JNI/NDK before `Init`.
 
 ## Quick start

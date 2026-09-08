@@ -146,6 +146,22 @@ public class RewriterTests
     }
 
     [Fact]
+    public void MultiFieldHandleStructsGetAConstructorCoveringEveryField()
+    {
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    public struct BufferHandle { public ushort idx; public ushort type; }
+                }
+            }
+            """;
+        var output = BindingRewriter.Rewrite(input);
+        Assert.Contains("readonly ushort idx", output);
+        Assert.Contains("readonly ushort type", output);
+        Assert.Contains("public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.type = type; }", output);
+    }
+
+    [Fact]
     public void NonHandleStructFieldsArePascalCased()
     {
         var input = """
