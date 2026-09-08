@@ -70,6 +70,9 @@ jobs:
           bash build/sync-bindings.sh
           bash build/run-generator.sh
 
+      - name: Refresh 3rd-party license inventory
+        run: bash build/audit-3rdparty-licenses.sh --write
+
       - name: Build to confirm bindings still compile
         run: dotnet build Bgfx.Net.sln -c Release -p:SkipNativeWarning=true
 

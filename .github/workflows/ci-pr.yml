@@ -42,6 +42,9 @@ jobs:
             exit 1
           fi
 
+      - name: Verify 3rd-party license inventory is in sync with submodules
+        run: bash build/audit-3rdparty-licenses.sh --check
+
       - name: Build solution
         run: dotnet build Bgfx.Net.sln -c Release -p:SkipNativeWarning=true
 
