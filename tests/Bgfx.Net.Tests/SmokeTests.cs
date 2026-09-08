@@ -48,6 +48,18 @@ public unsafe class SmokeTests
         Assert.True(a == b);
     }
 
+    [Fact]
+    public void BufferHandleCarriesTheTagOfTheHandleItConvertsFrom()
+    {
+        BufferHandle fromVertex = new VertexBufferHandle(7);
+        BufferHandle fromIndex = new IndexBufferHandle(7);
+
+        Assert.Equal((ushort)BufferHandleType.VertexBuffer, fromVertex.Type);
+        Assert.Equal((ushort)BufferHandleType.IndexBuffer, fromIndex.Type);
+        Assert.Equal(7, fromVertex.idx);
+        Assert.NotEqual(fromVertex, fromIndex);
+    }
+
     [SkippableFact]
     public void NoopRendererInitAndShutdown()
     {

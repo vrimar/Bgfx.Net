@@ -61,8 +61,8 @@ internal sealed class HandleStructRewriter : CSharpSyntaxRewriter
 
         if (!hasCtor && fields.Count > 0)
         {
-            var parameters = string.Join(", ", fields.Select(f => $"{f.Type} {f.Name}"));
-            var assignments = string.Join(" ", fields.Select(f => $"this.{f.Name} = {f.Name};"));
+            var parameters = string.Join(", ", fields.Select(f => $"{f.Type} {Camel(f.Name)}"));
+            var assignments = string.Join(" ", fields.Select(f => $"this.{f.Name} = {Camel(f.Name)};"));
             // SyntaxFactory-built members lose keyword separators ("publicXHandle").
             var parsedCtor = (ConstructorDeclarationSyntax)SyntaxFactory.ParseMemberDeclaration(
                 $"public {name}({parameters}) {{ {assignments} }}")!;
@@ -79,4 +79,6 @@ internal sealed class HandleStructRewriter : CSharpSyntaxRewriter
         return !field.Modifiers.Any(SyntaxKind.StaticKeyword)
             && !field.Modifiers.Any(SyntaxKind.ConstKeyword);
     }
+
+    private static string Camel(string name) => char.ToLowerInvariant(name[0]) + name[1..];
 }

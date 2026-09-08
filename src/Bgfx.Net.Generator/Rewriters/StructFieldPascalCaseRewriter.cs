@@ -5,35 +5,34 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Bgfx.Net.Generator;
 
 /// <summary>
-/// PascalCases public fields on namespace-level structs (excluding handle structs,
-/// whose <c>idx</c> field is handled separately). Maps <c>init.type</c> to
-/// <c>init.Type</c>, <c>resolution.numBackBuffers</c> to
-/// <c>Resolution.NumBackBuffers</c>, etc.
+/// PascalCases public fields on namespace-level structs: <c>init.type</c> to
+/// <c>Init.Type</c>, <c>swapChain.numBackBuffers</c> to <c>SwapChain.NumBackBuffers</c>.
+/// Handle structs keep <c>idx</c> lowercase because the <c>Valid</c> property upstream
+/// emits refers to it by that name.
 /// </summary>
 internal sealed class StructFieldPascalCaseRewriter : CSharpSyntaxRewriter
 {
+    private const string HandleIndexField = "idx";
+
     public override SyntaxNode? VisitStructDeclaration(StructDeclarationSyntax node)
     {
         var visited = (StructDeclarationSyntax)base.VisitStructDeclaration(node)!;
-        if (visited.Identifier.ValueText.EndsWith("Handle", StringComparison.Ordinal))
-        {
-            return visited;
-        }
 
-        // C# member-name namespace: a field cannot share its name with a sibling
-        // nested type. The bgfx binding has structs like Init { struct Limits; Limits limits; },
-        // so a naive `limits` -> `Limits` rename collides. Collect sibling type names
-        // and skip those renames.
-        var siblingTypeNames = new HashSet<string>(
+        // A field cannot share its name with a sibling nested type: Init { struct Limits; Limits limits; }.
+        var keep = new HashSet<string>(
             visited.Members.OfType<BaseTypeDeclarationSyntax>().Select(t => t.Identifier.ValueText),
             StringComparer.Ordinal);
+        if (visited.Identifier.ValueText.EndsWith("Handle", StringComparison.Ordinal))
+        {
+            keep.Add(char.ToUpperInvariant(HandleIndexField[0]) + HandleIndexField[1..]);
+        }
 
         var newMembers = SyntaxFactory.List<MemberDeclarationSyntax>(
-            visited.Members.Select(m => PascalCaseFieldNames(m, siblingTypeNames)));
+            visited.Members.Select(m => PascalCaseFieldNames(m, keep)));
         return visited.WithMembers(newMembers);
     }
 
-    private static MemberDeclarationSyntax PascalCaseFieldNames(MemberDeclarationSyntax member, HashSet<string> siblingTypeNames)
+    private static MemberDeclarationSyntax PascalCaseFieldNames(MemberDeclarationSyntax member, HashSet<string> keep)
     {
         if (member is not FieldDeclarationSyntax field)
         {
@@ -52,7 +51,7 @@ internal sealed class StructFieldPascalCaseRewriter : CSharpSyntaxRewriter
                 return v;
             }
             var pascal = char.ToUpperInvariant(name[0]) + name[1..];
-            if (siblingTypeNames.Contains(pascal))
+            if (keep.Contains(pascal))
             {
                 return v;
             }

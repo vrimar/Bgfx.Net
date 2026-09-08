@@ -14,12 +14,15 @@ namespace Bgfx.Net.Generator;
 /// </summary>
 internal static class BindingRewriter
 {
-    public static string Rewrite(string source)
+    public static string Rewrite(string source, C99Facts? facts = null)
     {
+        facts ??= C99Facts.Empty;
+
         var tree = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Latest));
         var root = (CompilationUnitSyntax)tree.GetRoot();
 
         root = (CompilationUnitSyntax)new StdIntTypeRewriter().Visit(root)!;
+        root = (CompilationUnitSyntax)new ArrayParamPointerRewriter(facts).Visit(root)!;
         root = (CompilationUnitSyntax)new NamespaceRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new ClassNameRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new NestedTypeHoistRewriter().Visit(root)!;
@@ -27,6 +30,7 @@ internal static class BindingRewriter
         root = (CompilationUnitSyntax)new LibraryImportRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new StructFieldPascalCaseRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new HandleStructRewriter().Visit(root)!;
+        root = (CompilationUnitSyntax)new TaggedHandleRewriter(facts).Visit(root)!;
         root = EnsureUsings(root);
         root = AddHeaderComment(root);
 

@@ -2932,11 +2932,27 @@ public readonly partial struct VertexLayoutHandle {
     public VertexLayoutHandle(ushort idx) { this.idx = idx; }
 	}
 
+	public enum BufferHandleType : ushort
+	{
+		DynamicIndexBuffer,
+		DynamicVertexBuffer,
+		IndexBuffer,
+		IndirectBuffer,
+		VertexBuffer,
+		Count,
+	}
+
+
 public readonly partial struct BufferHandle {
 	    public readonly ushort idx;
-	    public readonly ushort type;
+	    public readonly ushort Type;
 	    public bool Valid => idx != UInt16.MaxValue;
-    public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.type = type; }
+    public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.Type = type; }
+    public static implicit operator BufferHandle(DynamicIndexBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.DynamicIndexBuffer);
+    public static implicit operator BufferHandle(DynamicVertexBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.DynamicVertexBuffer);
+    public static implicit operator BufferHandle(IndexBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.IndexBuffer);
+    public static implicit operator BufferHandle(IndirectBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.IndirectBuffer);
+    public static implicit operator BufferHandle(VertexBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.VertexBuffer);
 	}
 public static partial class Bgfx
 {
@@ -3071,7 +3087,7 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_pack")]
 	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-		public static unsafe partial void VertexPack(float _input,[MarshalAs(UnmanagedType.U1)] bool _inputNormalized,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
+		public static unsafe partial void VertexPack(float* _input,[MarshalAs(UnmanagedType.U1)] bool _inputNormalized,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
 	
 	/// <summary>
 	/// Unpack vertex attribute from vertex stream format.
@@ -3085,7 +3101,7 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_unpack")]
 	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-		public static unsafe partial void VertexUnpack(float _output,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
+		public static unsafe partial void VertexUnpack(float* _output,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
 	
 	/// <summary>
 	/// Converts vertex stream data from one vertex stream format to another.
@@ -3133,7 +3149,7 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_topology_sort_tri_list")]
 	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-		public static unsafe partial void TopologySortTriList(TopologySort _sort,void* _dst,uint _dstSize,float _dir,float _pos,void* _vertices,uint _stride,void* _indices,uint _numIndices,[MarshalAs(UnmanagedType.U1)] bool _index32);
+		public static unsafe partial void TopologySortTriList(TopologySort _sort,void* _dst,uint _dstSize,float* _dir,float* _pos,void* _vertices,uint _stride,void* _indices,uint _numIndices,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
 	/// <summary>
 	/// Returns supported backend API renderers.
@@ -4328,7 +4344,7 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_palette_color")]
 	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-		public static unsafe partial void SetPaletteColor(byte _index,float _rgba);
+		public static unsafe partial void SetPaletteColor(byte _index,float* _rgba);
 	
 	/// <summary>
 	/// Set palette color value.

@@ -157,8 +157,8 @@ public class RewriterTests
             """;
         var output = BindingRewriter.Rewrite(input);
         Assert.Contains("readonly ushort idx", output);
-        Assert.Contains("readonly ushort type", output);
-        Assert.Contains("public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.type = type; }", output);
+        Assert.Contains("readonly ushort Type", output);
+        Assert.Contains("public BufferHandle(ushort idx, ushort type) { this.idx = idx; this.Type = type; }", output);
     }
 
     [Fact]
@@ -194,7 +194,7 @@ public class RewriterTests
     }
 
     [Fact]
-    public void HandleStructFieldsArePreservedLowercase()
+    public void HandleIdxFieldIsPreservedLowercase()
     {
         // The handle's `idx` field must stay lowercase because the generator's emitted
         // `Valid` property references it as `idx`.
@@ -208,5 +208,68 @@ public class RewriterTests
         var output = BindingRewriter.Rewrite(input);
         Assert.Contains("readonly ushort idx", output);
         Assert.DoesNotContain("readonly ushort Idx", output);
+    }
+
+    [Fact]
+    public void ArrayParametersBecomePointers()
+    {
+        var facts = C99Facts.Parse(
+            "BGFX_C_API void bgfx_set_palette_color(uint8_t _index, const float _rgba[4]);\n" +
+            "BGFX_C_API void bgfx_set_palette_color_rgba32f(uint8_t _index, float _r, float _g);\n");
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    [DllImport(DllName, EntryPoint="bgfx_set_palette_color", CallingConvention = CallingConvention.Cdecl)]
+                    public static extern unsafe void set_palette_color(byte _index, float _rgba);
+
+                    [DllImport(DllName, EntryPoint="bgfx_set_palette_color_rgba32f", CallingConvention = CallingConvention.Cdecl)]
+                    public static extern unsafe void set_palette_color_rgba32f(byte _index, float _r, float _g);
+                }
+            }
+            """;
+        var output = BindingRewriter.Rewrite(input, facts);
+        Assert.Contains("SetPaletteColor(byte _index,float* _rgba)", output);
+        Assert.Contains("SetPaletteColorRgba32f(byte _index,float _r,float _g)", output);
+    }
+
+    [Fact]
+    public void TaggedHandlesGetATagEnumAndImplicitConversions()
+    {
+        var facts = C99Facts.Parse("""
+            typedef struct bgfx_buffer_handle_s { uint16_t idx; uint16_t type; } bgfx_buffer_handle_t;
+
+            typedef enum bgfx_buffer_handle_type
+            {
+                BGFX_BUFFER_HANDLE_TYPE_INDEX_BUFFER,
+                BGFX_BUFFER_HANDLE_TYPE_VERTEX_BUFFER,
+
+                BGFX_BUFFER_HANDLE_TYPE_COUNT
+
+            } bgfx_buffer_handle_type_t;
+
+            static inline bgfx_buffer_handle_t bgfx_buffer_from_vertex_buffer(bgfx_vertex_buffer_handle_t _handle)
+            {
+                bgfx_buffer_handle_t handle;
+                handle.idx  = _handle.idx;
+                handle.type = BGFX_BUFFER_HANDLE_TYPE_VERTEX_BUFFER;
+                return handle;
+            }
+            """);
+        var input = """
+            namespace Bgfx {
+                public static partial class bgfx {
+                    public struct BufferHandle { public ushort idx; public ushort type; }
+                    public struct VertexBufferHandle { public ushort idx; }
+                }
+            }
+            """;
+        var output = BindingRewriter.Rewrite(input, facts);
+        Assert.Contains("public enum BufferHandleType : ushort", output);
+        Assert.Contains("IndexBuffer,", output);
+        Assert.Contains("VertexBuffer,", output);
+        Assert.Contains("Count,", output);
+        Assert.Contains(
+            "public static implicit operator BufferHandle(VertexBufferHandle handle) => new(handle.idx, (ushort)BufferHandleType.VertexBuffer);",
+            output);
     }
 }
