@@ -102,13 +102,21 @@ dotnet pack src/Bgfx.Net.Tools/Bgfx.Net.Tools.csproj -c Release -p:Version=0.1.0
 
 ## Bumping the bgfx submodule
 
+`external/bgfx` tracks the `bgfx.net` branch of the `vrimar/bgfx` fork: upstream
+master plus the fixes carried until they land upstream, rebased so that
+`git -C external/bgfx log upstream/master..bgfx.net` is exactly the carried set.
 A bgfx update is a release-worthy event. Procedure:
 
-1. `git -C external/bgfx fetch && git -C external/bgfx checkout <new-sha>`
-2. Run `build/sync-bindings.sh` and `build/run-generator.sh`.
-3. Build natives locally and run the test suite.
-4. Commit submodule bump + regenerated bindings together.
-5. Release a new MINOR (or MAJOR if the bgfx API broke binary compat).
+1. `build/sync-bgfx-fork.sh` — rebases `bgfx.net` onto upstream master and pushes it.
+   Resolve rebase conflicts there; a fix merged upstream drops out on its own.
+2. `git -C external/bgfx checkout bgfx.net` (now at the rebased head).
+3. Run `build/sync-bindings.sh` and `build/run-generator.sh`.
+4. Build natives locally and run the test suite.
+5. Commit submodule bump + regenerated bindings together.
+6. Release a new MINOR (or MAJOR if the bgfx API broke binary compat).
+
+To carry a new fix: commit it on `bgfx.net`, push, bump the pointer, and open the
+upstream PR from a branch on the fork holding the same commit.
 
 ## If a release fails mid-flight
 

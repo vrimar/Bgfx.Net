@@ -63,7 +63,9 @@ that obtains `nativeWindowHandle` from SDL2.
 
 ## Cloning
 
-This repository uses git submodules for `bgfx`, `bx`, and `bimg`:
+This repository uses git submodules for `bgfx`, `bx`, and `bimg`. `bgfx` points at
+the `bgfx.net` branch of the `vrimar/bgfx` fork, which is upstream master plus the
+fixes carried until they land upstream (see [RELEASING.md](RELEASING.md)):
 
 ```sh
 git clone --recurse-submodules https://github.com/$USER/Bgfx.Net.git

@@ -8,5 +8,5 @@ public static class BgfxBuildInfo
     public const int ApiVersion = 159;
 
     /// <summary>The pinned bgfx commit SHA.</summary>
-    public const string Revision = "9b636df330c81e11c84595651a291b6c59fb7396";
+    public const string Revision = "4bdc1c96e3f7d8bb6601602d296f027f1610f518";
 }
