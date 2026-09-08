@@ -12,7 +12,7 @@ OpenGL, OpenGL ES, and Metal backends.
 | `Bgfx.Net.Tools` | MSBuild integration that runs `shaderc` / `texturec` / `geometryc` at build time. Marked `developmentDependency`, so it doesn't propagate into consumer output. |
 
 Supported RIDs: `win-x64`, `linux-x64`, `osx-x64`, `osx-arm64`, `android-arm64`,
-`android-x64`. (`linux-arm64` is planned — blocked on upstream bx adding a native
+`android-x64`, `browser-wasm`. (`linux-arm64` is planned — blocked on upstream bx adding a native
 `linux-arm64-gcc` action.)
 
 On Android the native `libbgfx.so` is shipped under `runtimes/android-arm64/native`

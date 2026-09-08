@@ -3,7 +3,9 @@
 
   <!--
     Ships under buildTransitive/netstandard1.0/ so it reaches consumers through
-    a package reference. Archives sit alongside in bgfx.a/<emscripten-version>/,
+    a package reference. A .targets, not a .props: it imports after the project
+    body, so RuntimeIdentifier is set when the conditions below evaluate.
+    Archives sit alongside in bgfx.a/<emscripten-version>/,
     keyed by version because wasm objects only link against a .NET runtime pack
     built with the same emsdk.
 
