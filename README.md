@@ -27,19 +27,39 @@ gets it bundled into the APK automatically. Two consumer-side notes:
 
 ## Quick start
 
+The bindings mirror the bgfx C API, so entry points take pointers and the calling
+code is `unsafe`.
+
 ```csharp
 using Bgfx.Net;
 
-var init = new InitDescription { Type = RendererType.Vulkan };
-Bgfx.Init(in init);
+var init = default(Init);
+Bgfx.InitCtor(&init);
+init.Type = RendererType.Vulkan;
+init.SwapChain.Nwh = nativeWindowHandle;
+init.SwapChain.Width = 1280;
+init.SwapChain.Height = 720;
+init.Reset = (uint)ResetFlags.Vsync;
+
+if (!Bgfx.Init(&init))
+{
+    throw new InvalidOperationException("bgfx_init failed");
+}
+
+Bgfx.SetViewClear(0, (ushort)(ClearFlags.Color | ClearFlags.Depth), 0x303080ff, 1.0f, 0);
+Bgfx.SetViewRect(0, 0, 0, 1280, 720);
 
 while (running)
 {
-    Bgfx.Frame();
+    Bgfx.Touch(0);
+    Bgfx.Frame(0);
 }
 
 Bgfx.Shutdown();
 ```
+
+See [samples/Bgfx.Net.Sdl2Sample](samples/Bgfx.Net.Sdl2Sample) for a runnable version
+that obtains `nativeWindowHandle` from SDL2.
 
 ## Cloning
 

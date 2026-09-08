@@ -14,7 +14,7 @@ public unsafe class SmokeTests
             .FirstOrDefault(a => a.Key == "BgfxRevision");
 
         Assert.NotNull(attr);
-        Assert.False(string.IsNullOrEmpty(attr!.Value), "BgfxRevision metadata should be populated by sync-bindings.ps1");
+        Assert.False(string.IsNullOrEmpty(attr!.Value), "BgfxRevision metadata should be populated by sync-bindings.sh");
     }
 
     [Fact]
