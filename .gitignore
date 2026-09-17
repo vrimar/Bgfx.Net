@@ -20,6 +20,7 @@ publish/
 local-feed/
 
 # Native build outputs (from bgfx GENie + make)
+.build/
 external/bgfx/.build/
 external/bx/.build/
 external/bimg/.build/

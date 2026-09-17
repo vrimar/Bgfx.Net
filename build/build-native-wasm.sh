@@ -6,8 +6,8 @@
 # Stages bgfx.a, bx.a and bimg.a into
 # artifacts/native/browser-wasm/<emscripten-version>/.
 #
-# WebGL2 is set by the consumer at link time (-sMAX_WEBGL_VERSION=2); emscripten
-# ignores it while compiling, so it cannot be baked into the archives here.
+# Naming a renderer in BGFX_CONFIG switches every other one off, so a WebGL2
+# archive is BGFX_CONFIG=RENDERER_OPENGLES=30 plus -sMAX_WEBGL_VERSION=2 at link.
 #
 # Static, not shared: a browser-wasm consumer links the archive into
 # dotnet.native.wasm at publish time, so there is nothing to load at runtime.
@@ -34,9 +34,15 @@ if [ -z "${EMSDK_PATH:-}" ]; then
     export DOTNET_EMSCRIPTEN_LLVM_ROOT="$SDK_PACK/bin"
     export DOTNET_EMSCRIPTEN_BINARYEN_ROOT="$SDK_PACK"
     export DOTNET_EMSCRIPTEN_NODE_JS="$(find "$DOTNET_ROOT"/packs/Microsoft.NET.Runtime.Emscripten.*.Node.*/ -name node -type f 2>/dev/null | sort -V | tail -1)"
-    # FROZEN_CACHE is on in the pack's .emscripten, so the prebuilt sysroot has
-    # to be found or every compile fails trying to rebuild it.
-    export EM_CACHE="$(ls -d "$DOTNET_ROOT"/packs/Microsoft.NET.Runtime.Emscripten.*.Cache.*/*/tools/emscripten/cache 2>/dev/null | sort -V | tail -1)"
+    PACK_CACHE="$(ls -d "$DOTNET_ROOT"/packs/Microsoft.NET.Runtime.Emscripten.*.Cache.*/*/tools/emscripten/cache 2>/dev/null | sort -V | tail -1)"
+    # A copy: the pack's own is read-only and frozen, and --use-port builds into it.
+    export EM_CACHE="$REPO/.build/emcache"
+    if [ ! -d "$EM_CACHE" ]; then
+        mkdir -p "$EM_CACHE"
+        cp -r "$PACK_CACHE"/. "$EM_CACHE"/
+    fi
+    export FROZEN_CACHE=0
+    export EM_FROZEN_CACHE=0
 fi
 
 if [ ! -x "${DOTNET_EMSCRIPTEN_NODE_JS:-}" ]; then
@@ -76,7 +82,13 @@ BIN_DIR=".build/wasm/bin"
 
 echo "[build-native-wasm] emscripten $EMVER at $EMSCRIPTEN"
 cd "$BGFX"
-"$GENIE" --gcc=wasm gmake
+BGFX_CONFIG="${BGFX_CONFIG:-RENDERER_WEBGPU=1}" "$GENIE" --gcc=wasm gmake
+
+# A stale sanity stamp is cleared only after the port is unpacked into the cache,
+# deleting it mid-build; settle the stamp before anything asks for the port.
+mkdir -p "$REPO/.build"
+printf 'int main(){return 0;}\n' > "$REPO/.build/sanity.c"
+"$EMSCRIPTEN/emcc" "$REPO/.build/sanity.c" -o "$REPO/.build/sanity.o" -c
 
 # bx reads __EMSCRIPTEN_MAJOR__ to derive BX_PLATFORM_EMSCRIPTEN, but emscripten
 # stopped predefining it and the header it moved to spells it lowercase. Left
@@ -86,6 +98,8 @@ export CPPFLAGS="${CPPFLAGS:-} -include emscripten/version.h"
 export CPPFLAGS="$CPPFLAGS -D__EMSCRIPTEN_MAJOR__=__EMSCRIPTEN_major__"
 export CPPFLAGS="$CPPFLAGS -D__EMSCRIPTEN_MINOR__=__EMSCRIPTEN_minor__"
 export CPPFLAGS="$CPPFLAGS -D__EMSCRIPTEN_TINY__=__EMSCRIPTEN_tiny__"
+
+export CPPFLAGS="$CPPFLAGS --use-port=emdawnwebgpu"
 
 echo "[build-native-wasm] make -C $PROJ_DIR config=release bx bimg bgfx -j$NPROC"
 make -C "$PROJ_DIR" config=release bx bimg bgfx -j"$NPROC"
