@@ -7,10 +7,12 @@ namespace Bgfx.Net.Generator;
 /// <summary>
 /// Converts <c>[DllImport(DllName, EntryPoint="x", CallingConvention=CallingConvention.Cdecl)]
 /// public static extern unsafe T Name(...)</c> into the source-generated
-/// <c>[LibraryImport("bgfx", EntryPoint="x")] [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-/// public static partial T Name(...)</c> form. LibraryImport is AOT-friendly
-/// (no runtime marshaller required) and the analyzer flags unmarshallable
-/// types at compile time. Bool parameters and returns are explicitly marked
+/// <c>[LibraryImport("bgfx", EntryPoint="x")] public static partial T Name(...)</c> form.
+/// LibraryImport is AOT-friendly (no runtime marshaller required) and the analyzer
+/// flags unmarshallable types at compile time. No calling convention is restated:
+/// every shipped RID has a single native convention, and a <c>[UnmanagedCallConv]</c>
+/// with a <c>CallConvs</c> array crashes the .NET 11 mono-aot-cross compiler for
+/// browser-wasm. Bool parameters and returns are explicitly marked
 /// <c>[MarshalAs(UnmanagedType.U1)]</c>; LibraryImport rejects unmarshalled
 /// bools, and U1 (1-byte) matches bgfx's C99 <c>_Bool</c> ABI on every
 /// supported platform (DllImport's default 4-byte Windows BOOL was incorrect).
@@ -36,7 +38,6 @@ internal sealed class LibraryImportRewriter : CSharpSyntaxRewriter
         // matches what a human would type. Building these with SyntaxFactory.Attribute(...)
         // produces "LibraryImport(\"bgfx\",EntryPoint=..." with no spaces.
         var libraryImportAL = ParseAttributeList($"[LibraryImport(\"bgfx\", EntryPoint = {entryPointLiteral})]");
-        var unmanagedCallConvAL = ParseAttributeList("[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]");
 
         var newAttributeLists = SyntaxFactory.List<AttributeListSyntax>();
         foreach (var al in visited.AttributeLists)
@@ -53,9 +54,6 @@ internal sealed class LibraryImportRewriter : CSharpSyntaxRewriter
         newAttributeLists = newAttributeLists.Insert(0,
             libraryImportAL
                 .WithLeadingTrivia(leading)
-                .WithTrailingTrivia(SyntaxFactory.EndOfLine("\n"), SyntaxFactory.Whitespace("\t")));
-        newAttributeLists = newAttributeLists.Insert(1,
-            unmanagedCallConvAL
                 .WithTrailingTrivia(SyntaxFactory.EndOfLine("\n"), SyntaxFactory.Whitespace("\t")));
 
         var isBoolReturn = visited.ReturnType is PredefinedTypeSyntax pts && pts.Keyword.IsKind(SyntaxKind.BoolKeyword);

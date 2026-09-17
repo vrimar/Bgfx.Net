@@ -31,30 +31,9 @@ internal static class BindingRewriter
         root = (CompilationUnitSyntax)new StructFieldPascalCaseRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new HandleStructRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new TaggedHandleRewriter(facts).Visit(root)!;
-        root = EnsureUsings(root);
         root = AddHeaderComment(root);
 
         return root.ToFullString();
-    }
-
-    private static CompilationUnitSyntax EnsureUsings(CompilationUnitSyntax root)
-    {
-        // CallConvCdecl lives in System.Runtime.CompilerServices and is referenced
-        // by the per-method [UnmanagedCallConv] attribute LibraryImportRewriter emits.
-        var required = new[] { "System.Runtime.CompilerServices" };
-        var existing = new HashSet<string>(
-            root.Usings.Select(u => u.Name?.ToString() ?? string.Empty),
-            StringComparer.Ordinal);
-
-        foreach (var name in required)
-        {
-            if (existing.Add(name))
-            {
-                var parsed = (UsingDirectiveSyntax)SyntaxFactory.ParseCompilationUnit($"using {name};\n").Usings[0];
-                root = root.AddUsings(parsed);
-            }
-        }
-        return root;
     }
 
     private static CompilationUnitSyntax AddHeaderComment(CompilationUnitSyntax root)

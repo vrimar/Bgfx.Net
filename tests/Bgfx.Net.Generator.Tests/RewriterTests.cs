@@ -46,8 +46,8 @@ public class RewriterTests
         var output = BindingRewriter.Rewrite(input);
         Assert.Contains("[LibraryImport(\"bgfx\"", output);
         Assert.Contains("EntryPoint=\"bgfx_init\"", output.Replace(" ", ""));
-        Assert.Contains("UnmanagedCallConv", output);
-        Assert.Contains("CallConvCdecl", output);
+        Assert.DoesNotContain("UnmanagedCallConv", output);
+        Assert.DoesNotContain("CallingConvention", output);
         Assert.DoesNotContain("DllImport", output);
         Assert.DoesNotContain("DllName", output);
         Assert.DoesNotContain(" extern ", output);

@@ -19,7 +19,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 
 namespace Bgfx.Net
 {
@@ -3038,7 +3037,6 @@ public static partial class Bgfx
 	/// <param name="_height">Height of the region. 0 uses the rest of the mip from `_y`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_texture_region_init")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void TextureRegionInit(TextureRegion* _this,TextureHandle _handle,ushort _x,ushort _y,ushort _width,ushort _height);
 	
 	/// <summary>
@@ -3051,7 +3049,6 @@ public static partial class Bgfx
 	/// <param name="_texture">Texture region the buffer is copied to or from.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_buffer_region_init_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void BufferRegionInitTexture(BufferRegion* _this,TextureRegion* _texture);
 	
 	/// <summary>
@@ -3065,7 +3062,6 @@ public static partial class Bgfx
 	/// <param name="_size">Number of bytes. 0 uses the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_buffer_region_init_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void BufferRegionInitBuffer(BufferRegion* _this,BufferHandle _handle,uint _offset,uint _size);
 	
 	/// <summary>
@@ -3080,7 +3076,6 @@ public static partial class Bgfx
 	/// <param name="_resolve">Resolve flags. See: `BGFX_RESOLVE_*`</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_attachment_init")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void AttachmentInit(Attachment* _this,TextureHandle _handle,Access _access,ushort _layer,ushort _numLayers,ushort _mip,byte _resolve);
 	
 	/// <summary>
@@ -3090,7 +3085,6 @@ public static partial class Bgfx
 	/// <param name="_rendererType">Renderer backend type. See: `bgfx::RendererType`</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_layout_begin")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial VertexLayout* VertexLayoutBegin(VertexLayout* _this,RendererType _rendererType);
 	
 	/// <summary>
@@ -3107,7 +3101,6 @@ public static partial class Bgfx
 	/// <param name="_asInt">Packaging rule for vertexPack, vertexUnpack, and vertexConvert for AttribType::Uint8 and AttribType::Int16. Unpacking code must be implemented inside vertex shader.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_layout_add")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial VertexLayout* VertexLayoutAdd(VertexLayout* _this,Attrib _attrib,byte _num,AttribType _type,[MarshalAs(UnmanagedType.U1)] bool _normalized,[MarshalAs(UnmanagedType.U1)] bool _asInt);
 	
 	/// <summary>
@@ -3121,7 +3114,6 @@ public static partial class Bgfx
 	/// <param name="_asInt">Attribute is packed as int.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_layout_decode")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void VertexLayoutDecode(VertexLayout* _this,Attrib _attrib,byte * _num,AttribType* _type,bool* _normalized,bool* _asInt);
 	
 	/// <summary>
@@ -3131,7 +3123,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of bytes to skip.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_layout_skip")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial VertexLayout* VertexLayoutSkip(VertexLayout* _this,byte _num);
 	
 	/// <summary>
@@ -3139,7 +3130,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_layout_end")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void VertexLayoutEnd(VertexLayout* _this);
 	
 	/// <summary>
@@ -3154,7 +3144,6 @@ public static partial class Bgfx
 	/// <param name="_index">Vertex index that will be modified.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_pack")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void VertexPack(float* _input,[MarshalAs(UnmanagedType.U1)] bool _inputNormalized,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
 	
 	/// <summary>
@@ -3168,7 +3157,6 @@ public static partial class Bgfx
 	/// <param name="_index">Vertex index that will be unpacked.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_unpack")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void VertexUnpack(float* _output,Attrib _attr,VertexLayout* _layout,void* _data,uint _index);
 	
 	/// <summary>
@@ -3182,7 +3170,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of vertices to convert from source to destination.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_vertex_convert")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void VertexConvert(VertexLayout* _dstLayout,void* _dstData,VertexLayout* _srcLayout,void* _srcData,uint _num);
 	
 	/// <summary>
@@ -3197,7 +3184,6 @@ public static partial class Bgfx
 	/// <param name="_index32">Set to `true` if input indices are 32-bit.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_topology_convert")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint TopologyConvert(TopologyConvert _conversion,void* _dst,uint _dstSize,void* _indices,uint _numIndices,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
 	/// <summary>
@@ -3216,7 +3202,6 @@ public static partial class Bgfx
 	/// <param name="_index32">Set to `true` if input indices are 32-bit.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_topology_sort_tri_list")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void TopologySortTriList(TopologySort _sort,void* _dst,uint _dstSize,float* _dir,float* _pos,void* _vertices,uint _stride,void* _indices,uint _numIndices,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
 	/// <summary>
@@ -3227,7 +3212,6 @@ public static partial class Bgfx
 	/// <param name="_enum">Array where supported renderers will be written.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_supported_renderers")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial byte GetSupportedRenderers(byte _max,RendererType* _enum);
 	
 	/// <summary>
@@ -3237,7 +3221,6 @@ public static partial class Bgfx
 	/// <param name="_type">Renderer backend type. See: `bgfx::RendererType`</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_renderer_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial IntPtr GetRendererName(RendererType _type);
 	
 	/// <summary>
@@ -3247,7 +3230,6 @@ public static partial class Bgfx
 	/// <param name="_init">Pointer to structure to be initialized. See: `bgfx::Init` for more info.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_init_ctor")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void InitCtor(Init* _init);
 	
 	/// <summary>
@@ -3257,7 +3239,6 @@ public static partial class Bgfx
 	/// <param name="_init">Initialization parameters. See: `bgfx::Init` for more info.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_init")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		[return: MarshalAs(UnmanagedType.I1)]
 	public static unsafe partial bool Init(Init* _init);
 	
@@ -3266,7 +3247,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_shutdown")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Shutdown();
 	
 	/// <summary>
@@ -3281,7 +3261,6 @@ public static partial class Bgfx
 	/// <param name="_swapChain">Main window swap chain. When `NULL` the main window is left untouched and only the device and frame globals above are applied, which is what an application driving its own swap chains wants. Otherwise the main window takes on this description: resize it, change its format, or change its per-surface flags. Fields left neutral keep their current value, and `nwh`/`ndt` are ignored -- main's are bgfx's own. Must be `NULL` when `bgfx::init` created no main window.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_reset")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Reset(uint _flags,SwapChain* _swapChain);
 	
 	/// <summary>
@@ -3314,7 +3293,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Frame flags. See: `BGFX_FRAME_*` for more info.   - `BGFX_FRAME_NONE` - No frame flag.   - `BGFX_FRAME_DEBUG_CAPTURE` - Capture frame with graphics debugger.   - `BGFX_FRAME_DISCARD` - Discard all draw calls.   - `BGFX_FRAME_FLUSH` - Execute all rendering commands     without presenting the backbuffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_frame")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint Frame(byte _flags);
 	
 	/// <summary>
@@ -3326,7 +3304,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_renderer_type")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial RendererType GetRendererType();
 	
 	/// <summary>
@@ -3338,7 +3315,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_caps")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Caps* GetCaps();
 	
 	/// <summary>
@@ -3349,7 +3325,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_stats")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Stats* GetStats();
 	
 	/// <summary>
@@ -3359,7 +3334,6 @@ public static partial class Bgfx
 	/// <param name="_size">Size to allocate.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Memory* Alloc(uint _size);
 	
 	/// <summary>
@@ -3370,7 +3344,6 @@ public static partial class Bgfx
 	/// <param name="_size">Size of data to be copied.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_copy")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Memory* Copy(void* _data,uint _size);
 	
 	/// <summary>
@@ -3389,7 +3362,6 @@ public static partial class Bgfx
 	/// <param name="_size">Size of data.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_make_ref")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Memory* MakeRef(void* _data,uint _size);
 	
 	/// <summary>
@@ -3410,7 +3382,6 @@ public static partial class Bgfx
 	/// <param name="_userData">User data to be passed to callback function.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_make_ref_release")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Memory* MakeRefRelease(void* _data,uint _size,IntPtr _releaseFn,void* _userData);
 	
 	/// <summary>
@@ -3422,7 +3393,6 @@ public static partial class Bgfx
 	/// <param name="_scale">Debug text scale factor. 0 is the same as 1.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_debug")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetDebug(uint _debug,FrameBufferHandle _handle,byte _scale);
 	
 	/// <summary>
@@ -3433,7 +3403,6 @@ public static partial class Bgfx
 	/// <param name="_small">Default 8x16 or 8x8 font.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_clear")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DbgTextClear(byte _attr,[MarshalAs(UnmanagedType.U1)] bool _small);
 	
 	/// <summary>
@@ -3446,7 +3415,6 @@ public static partial class Bgfx
 	/// <param name="_format">`printf` style format.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_printf")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DbgTextPrintf(ushort _x,ushort _y,byte _attr,[MarshalAs(UnmanagedType.LPStr)] string _format,[MarshalAs(UnmanagedType.LPStr)] string args );
 	
 	/// <summary>
@@ -3460,7 +3428,6 @@ public static partial class Bgfx
 	/// <param name="_argList">Variable arguments list for format string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_vprintf")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DbgTextVprintf(ushort _x,ushort _y,byte _attr,[MarshalAs(UnmanagedType.LPStr)] string _format,IntPtr _argList);
 	
 	/// <summary>
@@ -3475,7 +3442,6 @@ public static partial class Bgfx
 	/// <param name="_pitch">Image pitch in bytes.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_image")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DbgTextImage(ushort _x,ushort _y,ushort _width,ushort _height,void* _data,ushort _pitch);
 	
 	/// <summary>
@@ -3486,7 +3452,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.   - `BGFX_BUFFER_NONE` - No flags.   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of       data is passed. If this flag is not specified, and more data is passed on update, the buffer       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic       buffers.   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on       index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial IndexBufferHandle CreateIndexBuffer(Memory* _mem,ushort _flags);
 	
 	/// <summary>
@@ -3510,7 +3475,6 @@ public static partial class Bgfx
 	/// <param name="_data">Destination buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_read_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint ReadBuffer(BufferRegion* _src,void* _data);
 	
 	/// <summary>
@@ -3522,7 +3486,6 @@ public static partial class Bgfx
 	/// <param name="_len">Static index buffer name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_index_buffer_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetIndexBufferName(IndexBufferHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -3532,7 +3495,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Static index buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyIndexBuffer(IndexBufferHandle _handle);
 	
 	/// <summary>
@@ -3542,7 +3504,6 @@ public static partial class Bgfx
 	/// <param name="_layout">Vertex layout.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_vertex_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial VertexLayoutHandle CreateVertexLayout(VertexLayout* _layout);
 	
 	/// <summary>
@@ -3552,7 +3513,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_vertex_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyVertexLayout(VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -3564,7 +3524,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.  - `BGFX_BUFFER_NONE` - No flags.  - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.  - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer      is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.  - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.  - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of      data is passed. If this flag is not specified, and more data is passed on update, the buffer      will be trimmed to fit the existing buffer size. This flag has effect only on dynamic buffers.  - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial VertexBufferHandle CreateVertexBuffer(Memory* _mem,VertexLayout* _layout,ushort _flags);
 	
 	/// <summary>
@@ -3576,7 +3535,6 @@ public static partial class Bgfx
 	/// <param name="_len">Static vertex buffer name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_vertex_buffer_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetVertexBufferName(VertexBufferHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -3586,7 +3544,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Static vertex buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyVertexBuffer(VertexBufferHandle _handle);
 	
 	/// <summary>
@@ -3597,7 +3554,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.   - `BGFX_BUFFER_NONE` - No flags.   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of       data is passed. If this flag is not specified, and more data is passed on update, the buffer       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic       buffers.   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on       index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial DynamicIndexBufferHandle CreateDynamicIndexBuffer(uint _num,ushort _flags);
 	
 	/// <summary>
@@ -3608,7 +3564,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.   - `BGFX_BUFFER_NONE` - No flags.   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of       data is passed. If this flag is not specified, and more data is passed on update, the buffer       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic       buffers.   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on       index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_dynamic_index_buffer_mem")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial DynamicIndexBufferHandle CreateDynamicIndexBufferMem(Memory* _mem,ushort _flags);
 	
 	/// <summary>
@@ -3620,7 +3575,6 @@ public static partial class Bgfx
 	/// <param name="_mem">Index buffer data.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateDynamicIndexBuffer(DynamicIndexBufferHandle _handle,uint _startIndex,Memory* _mem);
 	
 	/// <summary>
@@ -3630,7 +3584,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Dynamic index buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyDynamicIndexBuffer(DynamicIndexBufferHandle _handle);
 	
 	/// <summary>
@@ -3642,7 +3595,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.   - `BGFX_BUFFER_NONE` - No flags.   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of       data is passed. If this flag is not specified, and more data is passed on update, the buffer       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic       buffers.   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on       index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial DynamicVertexBufferHandle CreateDynamicVertexBuffer(uint _num,VertexLayout* _layout,ushort _flags);
 	
 	/// <summary>
@@ -3654,7 +3606,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Buffer creation flags.   - `BGFX_BUFFER_NONE` - No flags.   - `BGFX_BUFFER_COMPUTE_READ` - Buffer will be read from by compute shader.   - `BGFX_BUFFER_COMPUTE_WRITE` - Buffer will be written into by compute shader. When buffer       is created with `BGFX_BUFFER_COMPUTE_WRITE` flag it cannot be updated from CPU.   - `BGFX_BUFFER_COMPUTE_READ_WRITE` - Buffer will be used for read/write by compute shader.   - `BGFX_BUFFER_ALLOW_RESIZE` - Buffer will resize on buffer update if a different amount of       data is passed. If this flag is not specified, and more data is passed on update, the buffer       will be trimmed to fit the existing buffer size. This flag has effect only on dynamic       buffers.   - `BGFX_BUFFER_INDEX32` - Buffer is using 32-bit indices. This flag has effect only on       index buffers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_dynamic_vertex_buffer_mem")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial DynamicVertexBufferHandle CreateDynamicVertexBufferMem(Memory* _mem,VertexLayout* _layout,ushort _flags);
 	
 	/// <summary>
@@ -3666,7 +3617,6 @@ public static partial class Bgfx
 	/// <param name="_mem">Vertex buffer data.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateDynamicVertexBuffer(DynamicVertexBufferHandle _handle,uint _startVertex,Memory* _mem);
 	
 	/// <summary>
@@ -3676,7 +3626,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Dynamic vertex buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyDynamicVertexBuffer(DynamicVertexBufferHandle _handle);
 	
 	/// <summary>
@@ -3687,7 +3636,6 @@ public static partial class Bgfx
 	/// <param name="_index32">Set to `true` if input indices will be 32-bit.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_avail_transient_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint GetAvailTransientIndexBuffer(uint _num,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
 	/// <summary>
@@ -3698,7 +3646,6 @@ public static partial class Bgfx
 	/// <param name="_layout">Vertex layout.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_avail_transient_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint GetAvailTransientVertexBuffer(uint _num,VertexLayout* _layout);
 	
 	/// <summary>
@@ -3709,7 +3656,6 @@ public static partial class Bgfx
 	/// <param name="_stride">Stride per instance.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_avail_instance_data_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint GetAvailInstanceDataBuffer(uint _num,ushort _stride);
 	
 	/// <summary>
@@ -3722,7 +3668,6 @@ public static partial class Bgfx
 	/// <param name="_index32">Set to `true` if input indices will be 32-bit.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc_transient_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void AllocTransientIndexBuffer(TransientIndexBuffer* _tib,uint _num,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
 	/// <summary>
@@ -3734,7 +3679,6 @@ public static partial class Bgfx
 	/// <param name="_layout">Vertex layout.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc_transient_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void AllocTransientVertexBuffer(TransientVertexBuffer* _tvb,uint _num,VertexLayout* _layout);
 	
 	/// <summary>
@@ -3752,7 +3696,6 @@ public static partial class Bgfx
 	/// <param name="_index32">Set to `true` if input indices will be 32-bit.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc_transient_buffers")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		[return: MarshalAs(UnmanagedType.I1)]
 	public static unsafe partial bool AllocTransientBuffers(TransientVertexBuffer* _tvb,VertexLayout* _layout,uint _numVertices,TransientIndexBuffer* _tib,uint _numIndices,[MarshalAs(UnmanagedType.U1)] bool _index32);
 	
@@ -3765,7 +3708,6 @@ public static partial class Bgfx
 	/// <param name="_stride">Instance stride. Must be multiple of 16.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc_instance_data_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void AllocInstanceDataBuffer(InstanceDataBuffer* _idb,uint _num,ushort _stride);
 	
 	/// <summary>
@@ -3775,7 +3717,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of indirect calls.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_indirect_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial IndirectBufferHandle CreateIndirectBuffer(uint _num);
 	
 	/// <summary>
@@ -3785,7 +3726,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Indirect buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_indirect_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyIndirectBuffer(IndirectBufferHandle _handle);
 	
 	/// <summary>
@@ -3799,7 +3739,6 @@ public static partial class Bgfx
 	/// <param name="_mem">Shader binary.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_shader")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ShaderHandle CreateShader(Memory* _mem);
 	
 	/// <summary>
@@ -3815,7 +3754,6 @@ public static partial class Bgfx
 	/// <param name="_max">Maximum capacity of array.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_shader_uniforms")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ushort GetShaderUniforms(ShaderHandle _handle,UniformHandle* _uniforms,ushort _max);
 	
 	/// <summary>
@@ -3827,7 +3765,6 @@ public static partial class Bgfx
 	/// <param name="_len">Shader name length (if length is INT32_MAX, it's expected that _name is zero terminated string).</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_shader_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetShaderName(ShaderHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -3841,7 +3778,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Shader handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_shader")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyShader(ShaderHandle _handle);
 	
 	/// <summary>
@@ -3853,7 +3789,6 @@ public static partial class Bgfx
 	/// <param name="_destroyShaders">If true, shaders will be destroyed when program is destroyed.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_program")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ProgramHandle CreateProgram(ShaderHandle _vsh,ShaderHandle _fsh,[MarshalAs(UnmanagedType.U1)] bool _destroyShaders);
 	
 	/// <summary>
@@ -3864,7 +3799,6 @@ public static partial class Bgfx
 	/// <param name="_destroyShaders">If true, shaders will be destroyed when program is destroyed.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_compute_program")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ProgramHandle CreateComputeProgram(ShaderHandle _csh,[MarshalAs(UnmanagedType.U1)] bool _destroyShaders);
 	
 	/// <summary>
@@ -3874,7 +3808,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Program handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_program")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyProgram(ProgramHandle _handle);
 	
 	/// <summary>
@@ -3888,7 +3821,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture flags. See `BGFX_TEXTURE_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_is_texture_valid")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		[return: MarshalAs(UnmanagedType.I1)]
 	public static unsafe partial bool IsTextureValid(ushort _depth,[MarshalAs(UnmanagedType.U1)] bool _cubeMap,ushort _numLayers,TextureFormat _format,ulong _flags);
 	
@@ -3908,7 +3840,6 @@ public static partial class Bgfx
 	/// <param name="_maxActiveReferences">Maximum number of reference frames active at once.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_is_video_codec_valid")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		[return: MarshalAs(UnmanagedType.I1)]
 	public static unsafe partial bool IsVideoCodecValid(VideoCodec _codec,byte _chroma,byte _bitDepth,ushort _codedWidth,ushort _codedHeight,byte _maxDpbSlots,byte _maxActiveReferences);
 	
@@ -3920,7 +3851,6 @@ public static partial class Bgfx
 	/// <param name="_attachment">Attachment texture info. See: `bgfx::Attachment`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_is_frame_buffer_valid")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		[return: MarshalAs(UnmanagedType.I1)]
 	public static unsafe partial bool IsFrameBufferValid(byte _num,Attachment* _attachment);
 	
@@ -3938,7 +3868,6 @@ public static partial class Bgfx
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_calc_texture_size")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void CalcTextureSize(TextureInfo* _info,ushort _width,ushort _height,ushort _depth,[MarshalAs(UnmanagedType.U1)] bool _cubeMap,[MarshalAs(UnmanagedType.U1)] bool _hasMips,ushort _numLayers,TextureFormat _format);
 	
 	/// <summary>
@@ -3951,7 +3880,6 @@ public static partial class Bgfx
 	/// <param name="_info">When non-`NULL` is specified it returns parsed texture information.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle CreateTexture(Memory* _mem,ulong _flags,byte _skip,TextureInfo* _info);
 	
 	/// <summary>
@@ -3968,7 +3896,6 @@ public static partial class Bgfx
 	/// <param name="_external">Native API pointer to texture.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_texture_2d")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle CreateTexture2d(ushort _width,ushort _height,[MarshalAs(UnmanagedType.U1)] bool _hasMips,ushort _numLayers,TextureFormat _format,ulong _flags,Memory* _mem,ulong _external);
 	
 	/// <summary>
@@ -3983,7 +3910,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_texture_2d_scaled")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle CreateTexture2dScaled(BackbufferRatio _ratio,[MarshalAs(UnmanagedType.U1)] bool _hasMips,ushort _numLayers,TextureFormat _format,ulong _flags);
 	
 	/// <summary>
@@ -4000,7 +3926,6 @@ public static partial class Bgfx
 	/// <param name="_external">Native API pointer to texture.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_texture_3d")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle CreateTexture3d(ushort _width,ushort _height,ushort _depth,[MarshalAs(UnmanagedType.U1)] bool _hasMips,TextureFormat _format,ulong _flags,Memory* _mem,ulong _external);
 	
 	/// <summary>
@@ -4016,7 +3941,6 @@ public static partial class Bgfx
 	/// <param name="_external">Native API pointer to texture.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_texture_cube")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle CreateTextureCube(ushort _size,[MarshalAs(UnmanagedType.U1)] bool _hasMips,ushort _numLayers,TextureFormat _format,ulong _flags,Memory* _mem,ulong _external);
 	
 	/// <summary>
@@ -4037,7 +3961,6 @@ public static partial class Bgfx
 	/// <param name="_pitch">Pitch of input image (bytes). When _pitch is set to UINT16_MAX, it will be calculated internally based on _width.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_texture_2d")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateTexture2d(TextureHandle _handle,ushort _layer,byte _mip,ushort _x,ushort _y,ushort _width,ushort _height,Memory* _mem,ushort _pitch);
 	
 	/// <summary>
@@ -4058,7 +3981,6 @@ public static partial class Bgfx
 	/// <param name="_mem">Texture update data.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_texture_3d")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateTexture3d(TextureHandle _handle,byte _mip,ushort _x,ushort _y,ushort _z,ushort _width,ushort _height,ushort _depth,Memory* _mem);
 	
 	/// <summary>
@@ -4080,7 +4002,6 @@ public static partial class Bgfx
 	/// <param name="_pitch">Pitch of input image (bytes). When _pitch is set to UINT16_MAX, it will be calculated internally based on _width.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_texture_cube")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateTextureCube(TextureHandle _handle,ushort _layer,byte _side,byte _mip,ushort _x,ushort _y,ushort _width,ushort _height,Memory* _mem,ushort _pitch);
 	
 	/// <summary>
@@ -4095,7 +4016,6 @@ public static partial class Bgfx
 	/// <param name="_numLayers">Number of layers.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_clear_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void ClearTexture(TextureHandle _handle,byte _mip,byte _numMips,ushort _layer,ushort _numLayers);
 	
 	/// <summary>
@@ -4119,7 +4039,6 @@ public static partial class Bgfx
 	/// <param name="_data">Destination buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_read_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint ReadTexture(TextureRegion* _src,void* _data);
 	
 	/// <summary>
@@ -4131,7 +4050,6 @@ public static partial class Bgfx
 	/// <param name="_len">Texture name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_texture_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTextureName(TextureHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -4145,7 +4063,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Texture handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_direct_access_ptr")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void* GetDirectAccessPtr(TextureHandle _handle);
 	
 	/// <summary>
@@ -4155,7 +4072,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Texture handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyTexture(TextureHandle _handle);
 	
 	/// <summary>
@@ -4168,7 +4084,6 @@ public static partial class Bgfx
 	/// <param name="_textureFlags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_frame_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial FrameBufferHandle CreateFrameBuffer(ushort _width,ushort _height,TextureFormat _format,ulong _textureFlags);
 	
 	/// <summary>
@@ -4181,7 +4096,6 @@ public static partial class Bgfx
 	/// <param name="_textureFlags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_frame_buffer_scaled")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial FrameBufferHandle CreateFrameBufferScaled(BackbufferRatio _ratio,TextureFormat _format,ulong _textureFlags);
 	
 	/// <summary>
@@ -4193,7 +4107,6 @@ public static partial class Bgfx
 	/// <param name="_destroyTexture">If true, textures will be destroyed when frame buffer is destroyed.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_frame_buffer_from_handles")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial FrameBufferHandle CreateFrameBufferFromHandles(byte _num,TextureHandle* _handles,[MarshalAs(UnmanagedType.U1)] bool _destroyTexture);
 	
 	/// <summary>
@@ -4206,7 +4119,6 @@ public static partial class Bgfx
 	/// <param name="_destroyTexture">If true, textures will be destroyed when frame buffer is destroyed.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_frame_buffer_from_attachment")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial FrameBufferHandle CreateFrameBufferFromAttachment(byte _num,Attachment* _attachment,[MarshalAs(UnmanagedType.U1)] bool _destroyTexture);
 	
 	/// <summary>
@@ -4222,7 +4134,6 @@ public static partial class Bgfx
 	/// <param name="_desc">Swap chain description. See: `bgfx::SwapChain`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_frame_buffer_from_swap_chain")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial FrameBufferHandle CreateFrameBufferFromSwapChain(SwapChain* _desc);
 	
 	/// <summary>
@@ -4240,7 +4151,6 @@ public static partial class Bgfx
 	/// <param name="_desc">Swap chain description. See: `bgfx::SwapChain`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_update_swap_chain")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void UpdateSwapChain(FrameBufferHandle _handle,SwapChain* _desc);
 	
 	/// <summary>
@@ -4252,7 +4162,6 @@ public static partial class Bgfx
 	/// <param name="_len">Frame buffer name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_frame_buffer_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetFrameBufferName(FrameBufferHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -4262,7 +4171,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Frame buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial TextureHandle GetTexture(FrameBufferHandle _handle,byte _attachment);
 	
 	/// <summary>
@@ -4272,7 +4180,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Frame buffer handle.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_frame_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyFrameBuffer(FrameBufferHandle _handle);
 	
 	/// <summary>
@@ -4310,7 +4217,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements in array.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial UniformHandle CreateUniform([MarshalAs(UnmanagedType.LPStr)] string _name,UniformType _type,ushort _num);
 	
 	/// <summary>
@@ -4349,7 +4255,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements in array.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_uniform_with_freq")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial UniformHandle CreateUniformWithFreq([MarshalAs(UnmanagedType.LPStr)] string _name,UniformFreq _freq,UniformType _type,ushort _num);
 	
 	/// <summary>
@@ -4360,7 +4265,6 @@ public static partial class Bgfx
 	/// <param name="_info">Uniform info.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_uniform_info")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void GetUniformInfo(UniformHandle _handle,UniformInfo* _info);
 	
 	/// <summary>
@@ -4370,7 +4274,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Handle to uniform object.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyUniform(UniformHandle _handle);
 	
 	/// <summary>
@@ -4379,7 +4282,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_create_occlusion_query")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial OcclusionQueryHandle CreateOcclusionQuery();
 	
 	/// <summary>
@@ -4390,7 +4292,6 @@ public static partial class Bgfx
 	/// <param name="_result">Number of pixels that passed test. This argument can be `NULL` if result of occlusion query is not needed.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_result")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial OcclusionQueryResult GetResult(OcclusionQueryHandle _handle,int* _result);
 	
 	/// <summary>
@@ -4400,7 +4301,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Handle to occlusion query object.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_destroy_occlusion_query")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DestroyOcclusionQuery(OcclusionQueryHandle _handle);
 	
 	/// <summary>
@@ -4411,7 +4311,6 @@ public static partial class Bgfx
 	/// <param name="_rgba">RGBA floating point values.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_palette_color")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetPaletteColor(byte _index,float* _rgba);
 	
 	/// <summary>
@@ -4425,7 +4324,6 @@ public static partial class Bgfx
 	/// <param name="_a">Alpha value (RGBA floating point values)</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_palette_color_rgba32f")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetPaletteColorRgba32f(byte _index,float _r,float _g,float _b,float _a);
 	
 	/// <summary>
@@ -4436,7 +4334,6 @@ public static partial class Bgfx
 	/// <param name="_rgba">Packed 32-bit RGBA value.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_palette_color_rgba8")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetPaletteColorRgba8(byte _index,uint _rgba);
 	
 	/// <summary>
@@ -4459,7 +4356,6 @@ public static partial class Bgfx
 	/// <param name="_len">View name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_name")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewName(ushort _id,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -4473,7 +4369,6 @@ public static partial class Bgfx
 	/// <param name="_height">Height of view port region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_rect")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewRect(ushort _id,short _x,short _y,ushort _width,ushort _height);
 	
 	/// <summary>
@@ -4486,7 +4381,6 @@ public static partial class Bgfx
 	/// <param name="_ratio">Width and height will be set in respect to back-buffer size. See: `BackbufferRatio::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_rect_ratio")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewRectRatio(ushort _id,short _x,short _y,BackbufferRatio _ratio);
 	
 	/// <summary>
@@ -4501,7 +4395,6 @@ public static partial class Bgfx
 	/// <param name="_height">Height of view scissor region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_scissor")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewScissor(ushort _id,ushort _x,ushort _y,ushort _width,ushort _height);
 	
 	/// <summary>
@@ -4515,7 +4408,6 @@ public static partial class Bgfx
 	/// <param name="_stencil">Stencil clear value.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_clear")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewClear(ushort _id,ushort _flags,uint _rgba,float _depth,byte _stencil);
 	
 	/// <summary>
@@ -4538,7 +4430,6 @@ public static partial class Bgfx
 	/// <param name="_c7">Palette index for frame buffer attachment 7.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_clear_mrt")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewClearMrt(ushort _id,ushort _flags,float _depth,byte _stencil,byte _c0,byte _c1,byte _c2,byte _c3,byte _c4,byte _c5,byte _c6,byte _c7);
 	
 	/// <summary>
@@ -4553,7 +4444,6 @@ public static partial class Bgfx
 	/// <param name="_mode">View sort mode. See `ViewMode::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_mode")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewMode(ushort _id,ViewMode _mode);
 	
 	/// <summary>
@@ -4568,7 +4458,6 @@ public static partial class Bgfx
 	/// <param name="_handle">Frame buffer handle. Passing `BGFX_INVALID_HANDLE` as frame buffer handle will draw primitives from this view into default back buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_frame_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewFrameBuffer(ushort _id,FrameBufferHandle _handle);
 	
 	/// <summary>
@@ -4581,7 +4470,6 @@ public static partial class Bgfx
 	/// <param name="_proj">Projection matrix.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_transform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewTransform(ushort _id,void* _view,void* _proj);
 	
 	/// <summary>
@@ -4593,7 +4481,6 @@ public static partial class Bgfx
 	/// <param name="_order">View remap id table. Passing `NULL` will reset view ids to default state.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_order")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewOrder(ushort _id,ushort _num,ushort* _order);
 	
 	/// <summary>
@@ -4607,7 +4494,6 @@ public static partial class Bgfx
 	/// <param name="_shadingRate">Shading rate.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_shading_rate")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewShadingRate(ushort _id,ShadingRate _shadingRate);
 	
 	/// <summary>
@@ -4617,7 +4503,6 @@ public static partial class Bgfx
 	/// <param name="_id">_id View id.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_reset_view")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void ResetView(ushort _id);
 	
 	/// <summary>
@@ -4650,7 +4535,6 @@ public static partial class Bgfx
 	/// <param name="_forceNewEncoder">Force allocation of a new encoder from the pool, even when called from the API thread.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_begin")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial Encoder* EncoderBegin([MarshalAs(UnmanagedType.U1)] bool _forceNewEncoder);
 	
 	/// <summary>
@@ -4674,7 +4558,6 @@ public static partial class Bgfx
 	/// <param name="_encoder">Encoder.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_end")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderEnd(Encoder* _encoder);
 	
 	/// <summary>
@@ -4686,7 +4569,6 @@ public static partial class Bgfx
 	/// <param name="_len">Marker name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_marker")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetMarker(Encoder* _this,[MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -4709,7 +4591,6 @@ public static partial class Bgfx
 	/// <param name="_rgba">Sets blend factor used by `BGFX_STATE_BLEND_FACTOR` and   `BGFX_STATE_BLEND_INV_FACTOR` blend modes.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_state")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetState(Encoder* _this,ulong _state,uint _rgba);
 	
 	/// <summary>
@@ -4720,7 +4601,6 @@ public static partial class Bgfx
 	/// <param name="_visible">Render if occlusion query is visible.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_condition")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetCondition(Encoder* _this,OcclusionQueryHandle _handle,[MarshalAs(UnmanagedType.U1)] bool _visible);
 	
 	/// <summary>
@@ -4731,7 +4611,6 @@ public static partial class Bgfx
 	/// <param name="_bstencil">Back stencil state. If back is set to `BGFX_STENCIL_NONE` _fstencil is applied to both front and back facing primitives.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_stencil")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetStencil(Encoder* _this,uint _fstencil,uint _bstencil);
 	
 	/// <summary>
@@ -4748,7 +4627,6 @@ public static partial class Bgfx
 	/// <param name="_height">Height of view scissor region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_scissor")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ushort EncoderSetScissor(Encoder* _this,ushort _x,ushort _y,ushort _width,ushort _height);
 	
 	/// <summary>
@@ -4762,7 +4640,6 @@ public static partial class Bgfx
 	/// <param name="_cache">Index in scissor cache.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_scissor_cached")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetScissorCached(Encoder* _this,ushort _cache);
 	
 	/// <summary>
@@ -4774,7 +4651,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices in array.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_transform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint EncoderSetTransform(Encoder* _this,void* _mtx,ushort _num);
 	
 	/// <summary>
@@ -4785,7 +4661,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices from cache.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_transform_cached")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTransformCached(Encoder* _this,uint _cache,ushort _num);
 	
 	/// <summary>
@@ -4799,7 +4674,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_alloc_transform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint EncoderAllocTransform(Encoder* _this,Transform* _transform,ushort _num);
 	
 	/// <summary>
@@ -4811,7 +4685,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetUniform(Encoder* _this,UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
@@ -4827,7 +4700,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetViewUniform(ushort _id,UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
@@ -4842,7 +4714,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_frame_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetFrameUniform(UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
@@ -4854,7 +4725,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetIndexBuffer(Encoder* _this,IndexBufferHandle _handle,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -4866,7 +4736,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetDynamicIndexBuffer(Encoder* _this,DynamicIndexBufferHandle _handle,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -4878,7 +4747,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_transient_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTransientIndexBuffer(Encoder* _this,TransientIndexBuffer* _tib,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -4891,7 +4759,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetVertexBuffer(Encoder* _this,byte _stream,VertexBufferHandle _handle,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -4905,7 +4772,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetVertexBufferWithLayout(Encoder* _this,byte _stream,VertexBufferHandle _handle,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -4918,7 +4784,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetDynamicVertexBuffer(Encoder* _this,byte _stream,DynamicVertexBufferHandle _handle,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -4932,7 +4797,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_dynamic_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetDynamicVertexBufferWithLayout(Encoder* _this,byte _stream,DynamicVertexBufferHandle _handle,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -4945,7 +4809,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_transient_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTransientVertexBuffer(Encoder* _this,byte _stream,TransientVertexBuffer* _tvb,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -4959,7 +4822,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_transient_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTransientVertexBufferWithLayout(Encoder* _this,byte _stream,TransientVertexBuffer* _tvb,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -4972,7 +4834,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_vertex_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetVertexCount(Encoder* _this,uint _numVertices);
 	
 	/// <summary>
@@ -4984,7 +4845,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_instance_data_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetInstanceDataBuffer(Encoder* _this,InstanceDataBuffer* _idb,uint _start,uint _num);
 	
 	/// <summary>
@@ -4996,7 +4856,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_instance_data_from_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetInstanceDataFromVertexBuffer(Encoder* _this,VertexBufferHandle _handle,uint _startVertex,uint _num);
 	
 	/// <summary>
@@ -5008,7 +4867,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_instance_data_from_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetInstanceDataFromDynamicVertexBuffer(Encoder* _this,DynamicVertexBufferHandle _handle,uint _startVertex,uint _num);
 	
 	/// <summary>
@@ -5021,7 +4879,6 @@ public static partial class Bgfx
 	/// <param name="_numInstances">Number of instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_instance_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetInstanceCount(Encoder* _this,uint _numInstances);
 	
 	/// <summary>
@@ -5034,7 +4891,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTexture(Encoder* _this,byte _stage,UniformHandle _sampler,TextureHandle _handle,uint _flags);
 	
 	/// <summary>
@@ -5052,7 +4908,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_texture_view")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetTextureView(Encoder* _this,byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags);
 	
 	/// <summary>
@@ -5069,7 +4924,6 @@ public static partial class Bgfx
 	/// <param name="_id">View id.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_touch")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderTouch(Encoder* _this,ushort _id);
 	
 	/// <summary>
@@ -5082,7 +4936,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_submit")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSubmit(Encoder* _this,ushort _id,ProgramHandle _program,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5096,7 +4949,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_submit_occlusion_query")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSubmitOcclusionQuery(Encoder* _this,ushort _id,ProgramHandle _program,OcclusionQueryHandle _occlusionQuery,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5116,7 +4968,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_submit_indirect")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSubmitIndirect(Encoder* _this,ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,uint _num,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5138,7 +4989,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_submit_indirect_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSubmitIndirectCount(Encoder* _this,ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,IndexBufferHandle _numHandle,uint _numIndex,uint _numMax,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5150,7 +5000,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetComputeIndexBuffer(Encoder* _this,byte _stage,IndexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5162,7 +5011,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetComputeVertexBuffer(Encoder* _this,byte _stage,VertexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5174,7 +5022,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetComputeDynamicIndexBuffer(Encoder* _this,byte _stage,DynamicIndexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5186,7 +5033,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetComputeDynamicVertexBuffer(Encoder* _this,byte _stage,DynamicVertexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5198,7 +5044,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_indirect_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetComputeIndirectBuffer(Encoder* _this,byte _stage,IndirectBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5212,7 +5057,6 @@ public static partial class Bgfx
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_image")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetImage(Encoder* _this,byte _stage,TextureHandle _handle,byte _mip,Access _access,TextureFormat _format);
 	
 	/// <summary>
@@ -5229,7 +5073,6 @@ public static partial class Bgfx
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_image_view")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderSetImageView(Encoder* _this,byte _stage,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _mip,Access _access,TextureFormat _format);
 	
 	/// <summary>
@@ -5244,7 +5087,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_dispatch")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderDispatch(Encoder* _this,ushort _id,ProgramHandle _program,uint _numX,uint _numY,uint _numZ,byte _flags);
 	
 	/// <summary>
@@ -5259,7 +5101,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_dispatch_indirect")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderDispatchIndirect(Encoder* _this,ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,uint _num,byte _flags);
 	
 	/// <summary>
@@ -5269,7 +5110,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_discard")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderDiscard(Encoder* _this,byte _flags);
 	
 	/// <summary>
@@ -5292,7 +5132,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source texture region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_blit")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderBlit(Encoder* _this,ushort _id,TextureRegion* _dst,TextureRegion* _src);
 	
 	/// <summary>
@@ -5320,7 +5159,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source buffer region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_blit_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderBlitBuffer(Encoder* _this,ushort _id,BufferRegion* _dst,BufferRegion* _src);
 	
 	/// <summary>
@@ -5345,7 +5183,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source texture region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_blit_to_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderBlitToBuffer(Encoder* _this,ushort _id,BufferRegion* _dst,TextureRegion* _src);
 	
 	/// <summary>
@@ -5371,7 +5208,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source buffer region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_blit_from_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void EncoderBlitFromBuffer(Encoder* _this,ushort _id,TextureRegion* _dst,BufferRegion* _src);
 	
 	/// <summary>
@@ -5387,7 +5223,6 @@ public static partial class Bgfx
 	/// <param name="_filePath">Will be passed to `bgfx::CallbackI::screenShot` callback.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_request_screen_shot")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void RequestScreenShot(FrameBufferHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _filePath);
 	
 	/// <summary>
@@ -5434,7 +5269,6 @@ public static partial class Bgfx
 	/// <param name="_msecs">Timeout in milliseconds.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_render_frame")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial RenderFrame RenderFrame(int _msecs);
 	
 	/// <summary>
@@ -5448,7 +5282,6 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_get_internal_data")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial InternalData* GetInternalData();
 	
 	/// <summary>
@@ -5460,7 +5293,6 @@ public static partial class Bgfx
 	/// <param name="_len">Marker name length (if length is INT32_MAX, it's expected that _name is zero terminated string.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_marker")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetMarker([MarshalAs(UnmanagedType.LPStr)] string _name,int _len);
 	
 	/// <summary>
@@ -5483,7 +5315,6 @@ public static partial class Bgfx
 	/// <param name="_rgba">Sets blend factor used by `BGFX_STATE_BLEND_FACTOR` and   `BGFX_STATE_BLEND_INV_FACTOR` blend modes.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_state")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetState(ulong _state,uint _rgba);
 	
 	/// <summary>
@@ -5494,7 +5325,6 @@ public static partial class Bgfx
 	/// <param name="_visible">Render if occlusion query is visible.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_condition")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetCondition(OcclusionQueryHandle _handle,[MarshalAs(UnmanagedType.U1)] bool _visible);
 	
 	/// <summary>
@@ -5505,7 +5335,6 @@ public static partial class Bgfx
 	/// <param name="_bstencil">Back stencil state. If back is set to `BGFX_STENCIL_NONE` _fstencil is applied to both front and back facing primitives.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_stencil")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetStencil(uint _fstencil,uint _bstencil);
 	
 	/// <summary>
@@ -5522,7 +5351,6 @@ public static partial class Bgfx
 	/// <param name="_height">Height of view scissor region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_scissor")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial ushort SetScissor(ushort _x,ushort _y,ushort _width,ushort _height);
 	
 	/// <summary>
@@ -5536,7 +5364,6 @@ public static partial class Bgfx
 	/// <param name="_cache">Index in scissor cache.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_scissor_cached")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetScissorCached(ushort _cache);
 	
 	/// <summary>
@@ -5548,7 +5375,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices in array.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_transform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint SetTransform(void* _mtx,ushort _num);
 	
 	/// <summary>
@@ -5559,7 +5385,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices from cache.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_transform_cached")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTransformCached(uint _cache,ushort _num);
 	
 	/// <summary>
@@ -5573,7 +5398,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of matrices.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_alloc_transform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial uint AllocTransform(Transform* _transform,ushort _num);
 	
 	/// <summary>
@@ -5585,7 +5409,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_uniform")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetUniform(UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
@@ -5597,7 +5420,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetIndexBuffer(IndexBufferHandle _handle,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -5609,7 +5431,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetDynamicIndexBuffer(DynamicIndexBufferHandle _handle,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -5621,7 +5442,6 @@ public static partial class Bgfx
 	/// <param name="_numIndices">Number of indices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_transient_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTransientIndexBuffer(TransientIndexBuffer* _tib,uint _firstIndex,uint _numIndices);
 	
 	/// <summary>
@@ -5634,7 +5454,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetVertexBuffer(byte _stream,VertexBufferHandle _handle,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -5648,7 +5467,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetVertexBufferWithLayout(byte _stream,VertexBufferHandle _handle,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -5661,7 +5479,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetDynamicVertexBuffer(byte _stream,DynamicVertexBufferHandle _handle,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -5675,7 +5492,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_dynamic_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetDynamicVertexBufferWithLayout(byte _stream,DynamicVertexBufferHandle _handle,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -5688,7 +5504,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices to render.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_transient_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTransientVertexBuffer(byte _stream,TransientVertexBuffer* _tvb,uint _startVertex,uint _numVertices);
 	
 	/// <summary>
@@ -5702,7 +5517,6 @@ public static partial class Bgfx
 	/// <param name="_layoutHandle">Vertex layout for aliasing vertex buffer. If invalid handle is used, vertex layout used for creation of vertex buffer will be used.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_transient_vertex_buffer_with_layout")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTransientVertexBufferWithLayout(byte _stream,TransientVertexBuffer* _tvb,uint _startVertex,uint _numVertices,VertexLayoutHandle _layoutHandle);
 	
 	/// <summary>
@@ -5715,7 +5529,6 @@ public static partial class Bgfx
 	/// <param name="_numVertices">Number of vertices.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_vertex_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetVertexCount(uint _numVertices);
 	
 	/// <summary>
@@ -5727,7 +5540,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_instance_data_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetInstanceDataBuffer(InstanceDataBuffer* _idb,uint _start,uint _num);
 	
 	/// <summary>
@@ -5739,7 +5551,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_instance_data_from_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetInstanceDataFromVertexBuffer(VertexBufferHandle _handle,uint _startVertex,uint _num);
 	
 	/// <summary>
@@ -5751,7 +5562,6 @@ public static partial class Bgfx
 	/// <param name="_num">Number of data instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_instance_data_from_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetInstanceDataFromDynamicVertexBuffer(DynamicVertexBufferHandle _handle,uint _startVertex,uint _num);
 	
 	/// <summary>
@@ -5764,7 +5574,6 @@ public static partial class Bgfx
 	/// <param name="_numInstances">Number of instances.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_instance_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetInstanceCount(uint _numInstances);
 	
 	/// <summary>
@@ -5777,7 +5586,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_texture")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTexture(byte _stage,UniformHandle _sampler,TextureHandle _handle,uint _flags);
 	
 	/// <summary>
@@ -5795,7 +5603,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_texture_view")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetTextureView(byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags);
 	
 	/// <summary>
@@ -5810,7 +5617,6 @@ public static partial class Bgfx
 	/// <param name="_id">View id.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_touch")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Touch(ushort _id);
 	
 	/// <summary>
@@ -5823,7 +5629,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_submit")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Submit(ushort _id,ProgramHandle _program,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5837,7 +5642,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_submit_occlusion_query")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SubmitOcclusionQuery(ushort _id,ProgramHandle _program,OcclusionQueryHandle _occlusionQuery,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5857,7 +5661,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_submit_indirect")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SubmitIndirect(ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,uint _num,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5879,7 +5682,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Which states to discard for next draw. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_submit_indirect_count")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SubmitIndirectCount(ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,IndexBufferHandle _numHandle,uint _numIndex,uint _numMax,uint _depth,byte _flags);
 	
 	/// <summary>
@@ -5891,7 +5693,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetComputeIndexBuffer(byte _stage,IndexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5903,7 +5704,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetComputeVertexBuffer(byte _stage,VertexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5915,7 +5715,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_dynamic_index_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetComputeDynamicIndexBuffer(byte _stage,DynamicIndexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5927,7 +5726,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_dynamic_vertex_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetComputeDynamicVertexBuffer(byte _stage,DynamicVertexBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5939,7 +5737,6 @@ public static partial class Bgfx
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_indirect_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetComputeIndirectBuffer(byte _stage,IndirectBufferHandle _handle,Access _access);
 	
 	/// <summary>
@@ -5953,7 +5750,6 @@ public static partial class Bgfx
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_image")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetImage(byte _stage,TextureHandle _handle,byte _mip,Access _access,TextureFormat _format);
 	
 	/// <summary>
@@ -5970,7 +5766,6 @@ public static partial class Bgfx
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_image_view")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void SetImageView(byte _stage,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _mip,Access _access,TextureFormat _format);
 	
 	/// <summary>
@@ -5985,7 +5780,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dispatch")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Dispatch(ushort _id,ProgramHandle _program,uint _numX,uint _numY,uint _numZ,byte _flags);
 	
 	/// <summary>
@@ -6000,7 +5794,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Discard or preserve states. See `BGFX_DISCARD_*`.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dispatch_indirect")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void DispatchIndirect(ushort _id,ProgramHandle _program,IndirectBufferHandle _indirectHandle,uint _start,uint _num,byte _flags);
 	
 	/// <summary>
@@ -6010,7 +5803,6 @@ public static partial class Bgfx
 	/// <param name="_flags">Draw/compute states to discard.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_discard")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Discard(byte _flags);
 	
 	/// <summary>
@@ -6033,7 +5825,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source texture region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_blit")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void Blit(ushort _id,TextureRegion* _dst,TextureRegion* _src);
 	
 	/// <summary>
@@ -6061,7 +5852,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source buffer region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_blit_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void BlitBuffer(ushort _id,BufferRegion* _dst,BufferRegion* _src);
 	
 	/// <summary>
@@ -6086,7 +5876,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source texture region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_blit_to_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void BlitToBuffer(ushort _id,BufferRegion* _dst,TextureRegion* _src);
 	
 	/// <summary>
@@ -6112,7 +5901,6 @@ public static partial class Bgfx
 	/// <param name="_src">Source buffer region.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_blit_from_buffer")]
-	[UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
 		public static unsafe partial void BlitFromBuffer(ushort _id,TextureRegion* _dst,BufferRegion* _src);
 	
 }
