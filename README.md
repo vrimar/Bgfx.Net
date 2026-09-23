@@ -25,6 +25,12 @@ gets it bundled into the APK automatically. Two consumer-side notes:
 - Supply bgfx the native window: set `Init.SwapChain.Nwh` to the `ANativeWindow*`
   obtained from the Java `Surface` via JNI/NDK before `Init`.
 
+In the browser the WebGPU renderer cannot wait on its own adapter and device requests, so the
+page resolves a `GPUDevice` before the .NET runtime starts and stores it in
+`Module.preinitializedWebGPUDevice`. Set `Init.PlatformData.Context` to
+`Bgfx.ImportPageWebGpuDevice()` before `Init`. The page chooses the device's features and limits
+and handles `device.lost`; bgfx installs no callbacks on a device it was handed.
+
 ## Quick start
 
 The bindings mirror the bgfx C API, so entry points take pointers and the calling
@@ -47,7 +53,7 @@ if (!Bgfx.Init(&init))
 }
 
 Bgfx.SetViewClear(0, (ushort)(ClearFlags.Color | ClearFlags.Depth), 0x303080ff, 1.0f, 0);
-Bgfx.SetViewRect(0, 0, 0, 1280, 720);
+Bgfx.SetViewRect(0, 0, 0, 1280, 720, 0.0f, 1.0f);
 
 while (running)
 {

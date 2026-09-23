@@ -65,7 +65,7 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
 
             BgfxApi.SetDebug((uint)DebugFlags.Text, new FrameBufferHandle(ushort.MaxValue), 0);
             BgfxApi.SetViewClear(0, (ushort)(ClearFlags.Color | ClearFlags.Depth), 0x303080ff, 1.0f, 0);
-            BgfxApi.SetViewRect(0, 0, 0, Width, Height);
+            BgfxApi.SetViewRect(0, 0, 0, Width, Height, 0.0f, 1.0f);
 
             var frames = 0;
             var running = true;
@@ -91,7 +91,7 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
                         swapChain.Width = currentW;
                         swapChain.Height = currentH;
                         BgfxApi.Reset((uint)ResetFlags.Vsync, &swapChain);
-                        BgfxApi.SetViewRect(0, 0, 0, (ushort)currentW, (ushort)currentH);
+                        BgfxApi.SetViewRect(0, 0, 0, (ushort)currentW, (ushort)currentH, 0.0f, 1.0f);
                     }
                 }
 

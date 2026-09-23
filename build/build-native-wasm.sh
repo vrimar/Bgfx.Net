@@ -121,6 +121,10 @@ for lib in bgfx bx bimg; do
 done
 OUT="$NATIVE_OUT/bgfx.a"
 
+SHIM_OBJ="$REPO/.build/bgfx_net_browser.o"
+"$EMSCRIPTEN/emcc" -O2 -c "$REPO/src/Bgfx.Net/Native/bgfx_net_browser.c" -o "$SHIM_OBJ"
+"$EMSCRIPTEN/emar" r "$OUT" "$SHIM_OBJ"
+
 # Catches a host toolchain silently building a native archive instead. od, not
 # grep: the wasm magic leads with a NUL byte.
 if [ "$(ar p "$OUT" "$(ar t "$OUT" | head -1)" | od -An -tx1 -N4 | tr -d ' ')" != "0061736d" ]; then
@@ -130,10 +134,12 @@ fi
 
 # grep without -q drains nm's output so an early SIGPIPE under pipefail can't
 # masquerade as a build failure (see build-native-unix.sh).
-if ! "$DOTNET_EMSCRIPTEN_LLVM_ROOT/llvm-nm" --defined-only "$OUT" 2>/dev/null | grep -E '\bbgfx_init$' >/dev/null; then
-    echo "bgfx.a does not define bgfx_init" >&2
-    exit 1
-fi
+for sym in bgfx_init bgfx_net_webgpu_page_device; do
+    if ! "$DOTNET_EMSCRIPTEN_LLVM_ROOT/llvm-nm" --defined-only "$OUT" 2>/dev/null | grep -E "\b$sym\$" >/dev/null; then
+        echo "bgfx.a does not define $sym" >&2
+        exit 1
+    fi
+done
 
 echo "[build-native-wasm] symbol check OK — browser-wasm/$EMVER staged."
 ls -la "$NATIVE_OUT"

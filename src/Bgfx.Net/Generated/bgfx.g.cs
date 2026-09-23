@@ -693,6 +693,16 @@ namespace Bgfx.Net
 		/// Texture is shared with other device or other process.
 		/// </summary>
 		ExternalShared         = 0x0001000000000000,
+	
+		/// <summary>
+		/// Texture may be sampled and rendered with either sRGB-ness,
+		/// not just the one implied by its format. Every bind and
+		/// attachment must then state the encoding it wants (see
+		/// `BGFX_SAMPLER_SRGB`, `BGFX_ATTACHMENT_SRGB`). Costs nothing
+		/// until used, but may disable texture compression on some
+		/// hardware.
+		/// </summary>
+		SrgbMutable            = 0x0040000000000000,
 		ReservedShift          = 60,
 		ReservedMask           = 0xf000000000000000,
 	
@@ -862,6 +872,14 @@ namespace Bgfx.Net
 		/// Sample stencil instead of depth.
 		/// </summary>
 		SampleStencil          = 0x00100000,
+	
+		/// <summary>
+		/// Sample with sRGB conversion; absence of this flag samples
+		/// without it. Only affects textures created
+		/// `BGFX_TEXTURE_SRGB_MUTABLE`, which must state the encoding
+		/// explicitly on every bind; ignored for any other texture.
+		/// </summary>
+		Srgb                   = 0x00200000,
 		Point                  = 0x00000540,
 		UvwMirror              = 0x00000015,
 		UvwClamp               = 0x0000002a,
@@ -944,11 +962,6 @@ namespace Bgfx.Net
 		/// Enable HiDPI rendering.
 		/// </summary>
 		Hidpi                  = 0x00020000,
-	
-		/// <summary>
-		/// Enable depth clamp.
-		/// </summary>
-		DepthClamp             = 0x00040000,
 	
 		/// <summary>
 		/// Suspend rendering.
@@ -1330,10 +1343,10 @@ namespace Bgfx.Net
 	}
 
 [Flags]
-	public enum ResolveFlags : uint
+	public enum AttachmentFlags : uint
 	{
 		/// <summary>
-		/// No resolve flags.
+		/// No attachment flags.
 		/// </summary>
 		None                   = 0x00000000,
 	
@@ -1341,6 +1354,25 @@ namespace Bgfx.Net
 		/// Auto-generate mip maps on resolve.
 		/// </summary>
 		AutoGenMips            = 0x00000001,
+	
+		/// <summary>
+		/// Bind the depth aspect read-only (read-only depth-stencil view) so the
+		/// attachment can be sampled as a texture in the same pass.
+		/// </summary>
+		ReadOnlyDepth          = 0x00000002,
+	
+		/// <summary>
+		/// Bind the stencil aspect read-only.
+		/// </summary>
+		ReadOnlyStencil        = 0x00000004,
+	
+		/// <summary>
+		/// Render with sRGB conversion; absence of this flag renders without
+		/// it. Only affects textures created `BGFX_TEXTURE_SRGB_MUTABLE`,
+		/// which must state the encoding explicitly on every attachment;
+		/// ignored for any other texture.
+		/// </summary>
+		Srgb                   = 0x00000008,
 	}
 
 [Flags]
@@ -2778,7 +2810,7 @@ public unsafe struct Attachment
 		public ushort Mip;
 		public ushort Layer;
 		public ushort NumLayers;
-		public byte Resolve;
+		public byte Flags;
 	}
 
 public unsafe struct Transform
@@ -3073,10 +3105,10 @@ public static partial class Bgfx
 	/// <param name="_layer">Cubemap side or depth layer/slice to use.</param>
 	/// <param name="_numLayers">Number of texture layer/slice(s) in array to use.</param>
 	/// <param name="_mip">Mip level.</param>
-	/// <param name="_resolve">Resolve flags. See: `BGFX_RESOLVE_*`</param>
+	/// <param name="_flags">Attachment flags. See: `BGFX_ATTACHMENT_*`</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_attachment_init")]
-		public static unsafe partial void AttachmentInit(Attachment* _this,TextureHandle _handle,Access _access,ushort _layer,ushort _numLayers,ushort _mip,byte _resolve);
+		public static unsafe partial void AttachmentInit(Attachment* _this,TextureHandle _handle,Access _access,ushort _layer,ushort _numLayers,ushort _mip,byte _flags);
 	
 	/// <summary>
 	/// Start VertexLayout.
@@ -4367,9 +4399,11 @@ public static partial class Bgfx
 	/// <param name="_y">Position y from the top corner of the window. Can be negative to place view origin outside of the window.</param>
 	/// <param name="_width">Width of view port region.</param>
 	/// <param name="_height">Height of view port region.</param>
+	/// <param name="_minDepth">Viewport minimum depth (maps clip-space z=0).</param>
+	/// <param name="_maxDepth">Viewport maximum depth (maps clip-space z=1).</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_rect")]
-		public static unsafe partial void SetViewRect(ushort _id,short _x,short _y,ushort _width,ushort _height);
+		public static unsafe partial void SetViewRect(ushort _id,short _x,short _y,ushort _width,ushort _height,float _minDepth,float _maxDepth);
 	
 	/// <summary>
 	/// Set view rectangle. Draw primitive outside view will be clipped.
@@ -4396,6 +4430,30 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_scissor")]
 		public static unsafe partial void SetViewScissor(ushort _id,ushort _x,ushort _y,ushort _width,ushort _height);
+	
+	/// <summary>
+	/// Set view depth bias. Applies to all draws in the view unless overridden per-draw
+	/// with `bgfx::setDepthControl`.
+	/// </summary>
+	///
+	/// <param name="_id">View id.</param>
+	/// <param name="_constant">Constant depth bias.</param>
+	/// <param name="_slopeScale">Slope-scaled depth bias.</param>
+	/// <param name="_clamp">Depth bias clamp.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_depth_bias")]
+		public static unsafe partial void SetViewDepthBias(ushort _id,int _constant,float _slopeScale,float _clamp);
+	
+	/// <summary>
+	/// Set view multisample coverage mask. Combined with the per-draw mask set by
+	/// `bgfx::setSampleMask`, so a draw can narrow the view's mask but not widen it.
+	/// </summary>
+	///
+	/// <param name="_id">View id.</param>
+	/// <param name="_mask">Sample coverage mask.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_view_sample_mask")]
+		public static unsafe partial void SetViewSampleMask(ushort _id,uint _mask);
 	
 	/// <summary>
 	/// Set view clear flags.
@@ -4614,6 +4672,17 @@ public static partial class Bgfx
 		public static unsafe partial void EncoderSetStencil(Encoder* _this,uint _fstencil,uint _bstencil);
 	
 	/// <summary>
+	/// Set multisample coverage mask for draw primitive. Samples whose bit is clear
+	/// in the mask are never written, regardless of the coverage the rasterizer
+	/// computes. Only has an effect when rendering to a multisampled target.
+	/// </summary>
+	///
+	/// <param name="_mask">Sample coverage mask.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_sample_mask")]
+		public static unsafe partial void EncoderSetSampleMask(Encoder* _this,uint _mask);
+	
+	/// <summary>
 	/// Set scissor for draw primitive.
 	/// 
 	/// @remark
@@ -4641,6 +4710,28 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_scissor_cached")]
 		public static unsafe partial void EncoderSetScissorCached(Encoder* _this,ushort _cache);
+	
+	/// <summary>
+	/// Set depth control (depth bias and depth clip) for draw primitive. Overrides the
+	/// view depth bias for this draw.
+	/// </summary>
+	///
+	/// <param name="_constant">Constant depth bias.</param>
+	/// <param name="_slopeScale">Slope-scaled depth bias.</param>
+	/// <param name="_clamp">Depth bias clamp.</param>
+	/// <param name="_depthClamp">Disable depth clipping and clamp NDC depth to the [0,1] range instead.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_depth_control")]
+		public static unsafe partial ushort EncoderSetDepthControl(Encoder* _this,int _constant,float _slopeScale,float _clamp,[MarshalAs(UnmanagedType.U1)] bool _depthClamp);
+	
+	/// <summary>
+	/// Set depth control from depth-control cache for draw primitive.
+	/// </summary>
+	///
+	/// <param name="_cache">Index in depth control cache.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_depth_control_cached")]
+		public static unsafe partial void EncoderSetDepthControlCached(Encoder* _this,ushort _cache);
 	
 	/// <summary>
 	/// Set model matrix for draw primitive. If it is not called,
@@ -4686,6 +4777,20 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_uniform")]
 		public static unsafe partial void EncoderSetUniform(Encoder* _this,UniformHandle _handle,void* _value,ushort _num);
+	
+	/// <summary>
+	/// Set shader uniform parameter by reference. Unlike `Encoder::setUniform`, the data
+	/// is not copied immediately; the renderer reads it from `_value` at frame render
+	/// time. The pointer must remain valid and unchanged until the frame is rendered
+	/// (up to two `bgfx::frame` calls with multithreaded submission).
+	/// </summary>
+	///
+	/// <param name="_handle">Uniform.</param>
+	/// <param name="_value">Pointer to uniform data. Must stay valid until the frame is rendered.</param>
+	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_uniform_ref")]
+		public static unsafe partial void EncoderSetUniformRef(Encoder* _this,UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
 	/// Set shader uniform parameter for view.
@@ -4998,9 +5103,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Index buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_index_buffer")]
-		public static unsafe partial void EncoderSetComputeIndexBuffer(Encoder* _this,byte _stage,IndexBufferHandle _handle,Access _access);
+		public static unsafe partial void EncoderSetComputeIndexBuffer(Encoder* _this,byte _stage,IndexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute vertex buffer.
@@ -5009,9 +5116,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Vertex buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_vertex_buffer")]
-		public static unsafe partial void EncoderSetComputeVertexBuffer(Encoder* _this,byte _stage,VertexBufferHandle _handle,Access _access);
+		public static unsafe partial void EncoderSetComputeVertexBuffer(Encoder* _this,byte _stage,VertexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute dynamic index buffer.
@@ -5020,9 +5129,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Dynamic index buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_dynamic_index_buffer")]
-		public static unsafe partial void EncoderSetComputeDynamicIndexBuffer(Encoder* _this,byte _stage,DynamicIndexBufferHandle _handle,Access _access);
+		public static unsafe partial void EncoderSetComputeDynamicIndexBuffer(Encoder* _this,byte _stage,DynamicIndexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute dynamic vertex buffer.
@@ -5031,9 +5142,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Dynamic vertex buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_compute_dynamic_vertex_buffer")]
-		public static unsafe partial void EncoderSetComputeDynamicVertexBuffer(Encoder* _this,byte _stage,DynamicVertexBufferHandle _handle,Access _access);
+		public static unsafe partial void EncoderSetComputeDynamicVertexBuffer(Encoder* _this,byte _stage,DynamicVertexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute indirect buffer.
@@ -5338,6 +5451,17 @@ public static partial class Bgfx
 		public static unsafe partial void SetStencil(uint _fstencil,uint _bstencil);
 	
 	/// <summary>
+	/// Set multisample coverage mask for draw primitive. Samples whose bit is clear
+	/// in the mask are never written, regardless of the coverage the rasterizer
+	/// computes. Only has an effect when rendering to a multisampled target.
+	/// </summary>
+	///
+	/// <param name="_mask">Sample coverage mask.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_sample_mask")]
+		public static unsafe partial void SetSampleMask(uint _mask);
+	
+	/// <summary>
 	/// Set scissor for draw primitive.
 	/// 
 	/// @remark
@@ -5365,6 +5489,28 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_scissor_cached")]
 		public static unsafe partial void SetScissorCached(ushort _cache);
+	
+	/// <summary>
+	/// Set depth control (depth bias and depth clip) for draw primitive. Overrides the
+	/// view depth bias for this draw.
+	/// </summary>
+	///
+	/// <param name="_constant">Constant depth bias.</param>
+	/// <param name="_slopeScale">Slope-scaled depth bias.</param>
+	/// <param name="_clamp">Depth bias clamp.</param>
+	/// <param name="_depthClamp">Disable depth clipping and clamp NDC depth to the [0,1] range instead.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_depth_control")]
+		public static unsafe partial ushort SetDepthControl(int _constant,float _slopeScale,float _clamp,[MarshalAs(UnmanagedType.U1)] bool _depthClamp);
+	
+	/// <summary>
+	/// Set depth control from depth-control cache for draw primitive.
+	/// </summary>
+	///
+	/// <param name="_cache">Index in depth control cache.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_depth_control_cached")]
+		public static unsafe partial void SetDepthControlCached(ushort _cache);
 	
 	/// <summary>
 	/// Set model matrix for draw primitive. If it is not called,
@@ -5410,6 +5556,20 @@ public static partial class Bgfx
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_uniform")]
 		public static unsafe partial void SetUniform(UniformHandle _handle,void* _value,ushort _num);
+	
+	/// <summary>
+	/// Set shader uniform parameter by reference. Unlike `bgfx::setUniform`, the data
+	/// is not copied immediately; the renderer reads it from `_value` at frame render
+	/// time. The pointer must remain valid and unchanged until the frame is rendered
+	/// (up to two `bgfx::frame` calls with multithreaded submission).
+	/// </summary>
+	///
+	/// <param name="_handle">Uniform.</param>
+	/// <param name="_value">Pointer to uniform data. Must stay valid until the frame is rendered.</param>
+	/// <param name="_num">Number of elements. Passing `UINT16_MAX` will use the _num passed on uniform creation.</param>
+	///
+	[LibraryImport("bgfx", EntryPoint = "bgfx_set_uniform_ref")]
+		public static unsafe partial void SetUniformRef(UniformHandle _handle,void* _value,ushort _num);
 	
 	/// <summary>
 	/// Set index buffer for draw primitive.
@@ -5691,9 +5851,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Index buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_index_buffer")]
-		public static unsafe partial void SetComputeIndexBuffer(byte _stage,IndexBufferHandle _handle,Access _access);
+		public static unsafe partial void SetComputeIndexBuffer(byte _stage,IndexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute vertex buffer.
@@ -5702,9 +5864,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Vertex buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_vertex_buffer")]
-		public static unsafe partial void SetComputeVertexBuffer(byte _stage,VertexBufferHandle _handle,Access _access);
+		public static unsafe partial void SetComputeVertexBuffer(byte _stage,VertexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute dynamic index buffer.
@@ -5713,9 +5877,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Dynamic index buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_dynamic_index_buffer")]
-		public static unsafe partial void SetComputeDynamicIndexBuffer(byte _stage,DynamicIndexBufferHandle _handle,Access _access);
+		public static unsafe partial void SetComputeDynamicIndexBuffer(byte _stage,DynamicIndexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute dynamic vertex buffer.
@@ -5724,9 +5890,11 @@ public static partial class Bgfx
 	/// <param name="_stage">Compute stage.</param>
 	/// <param name="_handle">Dynamic vertex buffer handle.</param>
 	/// <param name="_access">Buffer access. See `Access::Enum`.</param>
+	/// <param name="_offset">Byte offset the shader's view of the buffer starts at. Must be a multiple of 256 bytes.</param>
+	/// <param name="_size">Bytes bound from the offset, `UINT32_MAX` for the rest of the buffer.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_compute_dynamic_vertex_buffer")]
-		public static unsafe partial void SetComputeDynamicVertexBuffer(byte _stage,DynamicVertexBufferHandle _handle,Access _access);
+		public static unsafe partial void SetComputeDynamicVertexBuffer(byte _stage,DynamicVertexBufferHandle _handle,Access _access,uint _offset,uint _size);
 	
 	/// <summary>
 	/// Set compute indirect buffer.
