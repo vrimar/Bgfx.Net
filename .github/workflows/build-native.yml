@@ -59,8 +59,7 @@ jobs:
             runner: ubuntu-24.04
             script: bash build/build-native-android.sh android-x64
             apt: 'patchelf'
-          # The emdawnwebgpu port and the 6.0.2 archive key the consumer's targets expect exist
-          # only in the .NET 11 emscripten; global.json pins SDK 10, so this job picks its own.
+          # The emdawnwebgpu port exists only in the .NET 11 emscripten; global.json pins SDK 10.
           - rid: browser-wasm
             runner: ubuntu-24.04
             script: bash build/build-native-wasm.sh
