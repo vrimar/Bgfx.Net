@@ -28,6 +28,9 @@ internal static class BindingRewriter
         root = (CompilationUnitSyntax)new NestedTypeHoistRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new MethodNameRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new LibraryImportRewriter().Visit(root)!;
+        var variadics = new VariadicRewriter(facts);
+        root = (CompilationUnitSyntax)variadics.Visit(root)!;
+        variadics.EnsureComplete();
         root = (CompilationUnitSyntax)new StructFieldPascalCaseRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new HandleStructRewriter().Visit(root)!;
         root = (CompilationUnitSyntax)new TaggedHandleRewriter(facts).Visit(root)!;

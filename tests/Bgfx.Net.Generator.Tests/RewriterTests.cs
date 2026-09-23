@@ -196,6 +196,145 @@ public class RewriterTests
         Assert.Contains("WeirdHandle", ex.Message);
     }
 
+    private const string PrintfHeader =
+        "BGFX_C_API void bgfx_dbg_text_printf(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, ... );\n";
+
+    private const string VprintfHeader =
+        "BGFX_C_API void bgfx_dbg_text_vprintf(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, va_list _argList);\n";
+
+    private const string PrintfBinding = """
+        /// <summary>
+        /// Print formatted data to internal debug text character-buffer.
+        /// </summary>
+        /// <param name="_format">`printf` style
+        /// format.</param>
+        [DllImport(DllName, EntryPoint="bgfx_dbg_text_printf", CallingConvention = CallingConvention.Cdecl)]
+        public static extern unsafe void dbg_text_printf(ushort _x, ushort _y, byte _attr, [MarshalAs(UnmanagedType.LPStr)] string _format, [MarshalAs(UnmanagedType.LPStr)] string args );
+        """;
+
+    private const string VprintfBinding = """
+        [DllImport(DllName, EntryPoint="bgfx_dbg_text_vprintf", CallingConvention = CallingConvention.Cdecl)]
+        public static extern unsafe void dbg_text_vprintf(ushort _x, ushort _y, byte _attr, [MarshalAs(UnmanagedType.LPStr)] string _format, IntPtr _argList);
+        """;
+
+    private static string InBgfxClass(params string[] members) =>
+        "namespace Bgfx {\npublic static partial class bgfx {\n" + string.Join("\n", members) + "\n}\n}\n";
+
+    [Fact]
+    public void VariadicFunctionsPrintVerbatimTextAndKeepTheVarargsSlot()
+    {
+        var output = BindingRewriter.Rewrite(
+            InBgfxClass(PrintfBinding, VprintfBinding), C99Facts.Parse(PrintfHeader + VprintfHeader));
+
+        Assert.Contains("public static unsafe void DbgTextPrint(ushort _x, ushort _y, byte _attr, string _text)", output);
+        Assert.Contains("DbgTextPrintfNative(_x, _y, _attr, (_text ?? string.Empty).Replace(\"%\", \"%%\", StringComparison.Ordinal), null);", output);
+        Assert.Contains("private static unsafe partial void DbgTextPrintfNative(", output);
+        Assert.Contains("string _format,void* _varargs)", output);
+        Assert.Contains("<param name=\"_text\">", output);
+        Assert.Contains("Print data to internal debug text character-buffer.", output);
+        Assert.DoesNotContain("<param name=\"_format\">", output);
+        Assert.DoesNotContain("formatted", output);
+        Assert.DoesNotContain("string args", output);
+        Assert.DoesNotContain("public static unsafe void DbgTextPrintf(", output);
+    }
+
+    [Fact]
+    public void VaListSiblingsAreDropped()
+    {
+        var output = BindingRewriter.Rewrite(
+            InBgfxClass(PrintfBinding, VprintfBinding), C99Facts.Parse(PrintfHeader + VprintfHeader));
+
+        Assert.DoesNotContain("bgfx_dbg_text_vprintf", output);
+        Assert.DoesNotContain("DbgTextVprintf", output);
+    }
+
+    [Fact]
+    public void VariadicWrappersForwardRefModifiers()
+    {
+        var facts = C99Facts.Parse("BGFX_C_API void bgfx_log(int32_t* _count, const char* _format, ... );\n");
+        var input = InBgfxClass("""
+            [DllImport(DllName, EntryPoint="bgfx_log", CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe void log(ref int _count, [MarshalAs(UnmanagedType.LPStr)] string _format, [MarshalAs(UnmanagedType.LPStr)] string args );
+            """);
+
+        var output = BindingRewriter.Rewrite(input, facts);
+
+        Assert.Contains("public static unsafe void Log(ref int _count, string _text)", output);
+        Assert.Contains("LogNative(ref _count, (_text ?? string.Empty)", output);
+    }
+
+    [Fact]
+    public void VariadicFunctionsWithAnUnexpectedPlaceholderFailLoudly()
+    {
+        var input = InBgfxClass("""
+            [DllImport(DllName, EntryPoint="bgfx_dbg_text_printf", CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe void dbg_text_printf(ushort _x, ushort _y, byte _attr, [MarshalAs(UnmanagedType.LPStr)] string _format, IntPtr _argList);
+            """);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => BindingRewriter.Rewrite(input, C99Facts.Parse(PrintfHeader)));
+        Assert.Contains("DbgTextPrintf", ex.Message);
+    }
+
+    [Fact]
+    public void VariadicFunctionsWithAMismatchedFormatParameterFailLoudly()
+    {
+        var facts = C99Facts.Parse(
+            "BGFX_C_API void bgfx_dbg_text_printf(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _fmt, ... );\n");
+
+        var ex = Assert.Throws<InvalidOperationException>(() => BindingRewriter.Rewrite(InBgfxClass(PrintfBinding), facts));
+        Assert.Contains("_fmt", ex.Message);
+    }
+
+    [Fact]
+    public void VariadicFunctionsWithANonStringFormatFailLoudly()
+    {
+        var input = InBgfxClass("""
+            [DllImport(DllName, EntryPoint="bgfx_dbg_text_printf", CallingConvention = CallingConvention.Cdecl)]
+            public static extern unsafe void dbg_text_printf(ushort _x, ushort _y, byte _attr, IntPtr _format, [MarshalAs(UnmanagedType.LPStr)] string args );
+            """);
+
+        var ex = Assert.Throws<InvalidOperationException>(() => BindingRewriter.Rewrite(input, C99Facts.Parse(PrintfHeader)));
+        Assert.Contains("string _format", ex.Message);
+    }
+
+    [Fact]
+    public void VariadicFunctionsLeftUnrewrittenFailLoudly()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() =>
+            BindingRewriter.Rewrite(InBgfxClass(PrintfBinding), C99Facts.Parse(PrintfHeader + VprintfHeader)));
+        Assert.Contains("bgfx_dbg_text_vprintf", ex.Message);
+    }
+
+    [Fact]
+    public void VarargsPlaceholdersWithoutAHeaderFactFailLoudly()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => BindingRewriter.Rewrite(InBgfxClass(PrintfBinding)));
+        Assert.Contains("bgfx_dbg_text_printf", ex.Message);
+    }
+
+    [Fact]
+    public void C99FactsReadVariadicAndVaListExportsOnly()
+    {
+        var facts = C99Facts.Parse(PrintfHeader + VprintfHeader + """
+            typedef struct bgfx_interface_vtbl
+            {
+                void (*dbg_text_printf)(uint16_t _x, uint16_t _y, uint8_t _attr, const char* _format, ... );
+            } bgfx_interface_vtbl_t;
+            BGFX_C_API void bgfx_frame(void);
+            """);
+
+        Assert.Equal("_format", Assert.Single(facts.VariadicFormatParameters).Value);
+        Assert.Equal("bgfx_dbg_text_vprintf", Assert.Single(facts.VaListFunctions));
+    }
+
+    [Fact]
+    public void C99FactsRejectAnUnreadableFormatParameter()
+    {
+        var ex = Assert.Throws<InvalidOperationException>(() => C99Facts.Parse(
+            "BGFX_C_API void bgfx_dbg_text_printf(uint16_t _x, const char* _format /* fmt */, ... );\n"));
+        Assert.Contains("bgfx_dbg_text_printf", ex.Message);
+    }
+
     [Fact]
     public void NonHandleStructFieldsArePascalCased()
     {

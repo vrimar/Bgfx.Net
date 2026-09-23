@@ -14,7 +14,8 @@ internal sealed record TagConversion(string FromHandle, string Member);
 /// <summary>
 /// Recovers from bgfx's C99 header what upstream's C# binding drops: parameters
 /// declared as C arrays (pointers in the ABI, by-value scalars in <c>bgfx.cs</c>),
-/// and handle types carrying a tag discriminator.
+/// handle types carrying a tag discriminator, and which functions take C varargs or
+/// a <c>va_list</c>.
 /// </summary>
 internal sealed class C99Facts
 {
@@ -22,8 +23,8 @@ internal sealed class C99Facts
         @"BGFX_C_API\s+[^;{]*?\b(bgfx_\w+)\s*\(([^;]*?)\)\s*;",
         RegexOptions.Singleline | RegexOptions.Compiled);
 
-    private static readonly Regex ArrayParameter = new(
-        @"\b(\w+)\s*\[\s*\d*\s*\]\s*$",
+    private static readonly Regex ParameterName = new(
+        @"\b(\w+)\s*(?<array>\[\s*\d*\s*\])?\s*$",
         RegexOptions.Compiled);
 
     private static readonly Regex TagEnum = new(
@@ -36,47 +37,73 @@ internal sealed class C99Facts
 
     public static C99Facts Empty { get; } = new(
         new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal),
-        Array.Empty<TaggedHandle>());
+        Array.Empty<TaggedHandle>(),
+        new Dictionary<string, string>(StringComparer.Ordinal),
+        new HashSet<string>(StringComparer.Ordinal));
 
     private C99Facts(
         IReadOnlyDictionary<string, IReadOnlySet<string>> arrayParameters,
-        IReadOnlyList<TaggedHandle> taggedHandles)
+        IReadOnlyList<TaggedHandle> taggedHandles,
+        IReadOnlyDictionary<string, string> variadicFormatParameters,
+        IReadOnlySet<string> vaListFunctions)
     {
         ArrayParameters = arrayParameters;
         TaggedHandles = taggedHandles;
+        VariadicFormatParameters = variadicFormatParameters;
+        VaListFunctions = vaListFunctions;
     }
 
     public IReadOnlyDictionary<string, IReadOnlySet<string>> ArrayParameters { get; }
 
     public IReadOnlyList<TaggedHandle> TaggedHandles { get; }
 
+    public IReadOnlyDictionary<string, string> VariadicFormatParameters { get; }
+
+    public IReadOnlySet<string> VaListFunctions { get; }
+
     public static C99Facts Parse(string header)
     {
-        return new C99Facts(ParseArrayParameters(header), ParseTaggedHandles(header));
-    }
-
-    private static Dictionary<string, IReadOnlySet<string>> ParseArrayParameters(string header)
-    {
-        var result = new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
+        var arrayParameters = new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal);
+        var variadicFormatParameters = new Dictionary<string, string>(StringComparer.Ordinal);
+        var vaListFunctions = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (Match function in ExportedFunction.Matches(header))
         {
-            var arrays = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var parameter in SplitTopLevel(function.Groups[2].Value))
+            var name = function.Groups[1].Value;
+            var parameters = SplitTopLevel(function.Groups[2].Value).Select(p => p.Trim()).ToList();
+            if (parameters.Count == 0)
             {
-                var array = ArrayParameter.Match(parameter.Trim());
-                if (array.Success)
-                {
-                    arrays.Add(array.Groups[1].Value);
-                }
+                continue;
             }
+
+            var arrays = parameters
+                .Select(p => ParameterName.Match(p))
+                .Where(m => m.Success && m.Groups["array"].Success)
+                .Select(m => m.Groups[1].Value)
+                .ToHashSet(StringComparer.Ordinal);
             if (arrays.Count > 0)
             {
-                result[function.Groups[1].Value] = arrays;
+                arrayParameters[name] = arrays;
+            }
+
+            if (parameters[^1].StartsWith("va_list", StringComparison.Ordinal))
+            {
+                vaListFunctions.Add(name);
+            }
+
+            if (parameters[^1] == "...")
+            {
+                var format = parameters.Count >= 2 ? ParameterName.Match(parameters[^2]) : Match.Empty;
+                if (!format.Success || format.Groups["array"].Success)
+                {
+                    throw new InvalidOperationException(
+                        $"{name}: cannot read the format parameter's name before '...' in '{function.Groups[2].Value.Trim()}'.");
+                }
+                variadicFormatParameters[name] = format.Groups[1].Value;
             }
         }
 
-        return result;
+        return new C99Facts(arrayParameters, ParseTaggedHandles(header), variadicFormatParameters, vaListFunctions);
     }
 
     private static List<TaggedHandle> ParseTaggedHandles(string header)

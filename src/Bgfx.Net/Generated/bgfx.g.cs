@@ -3438,29 +3438,19 @@ public static partial class Bgfx
 		public static unsafe partial void DbgTextClear(byte _attr,[MarshalAs(UnmanagedType.U1)] bool _small);
 	
 	/// <summary>
-	/// Print formatted data to internal debug text character-buffer (VGA-compatible text mode).
+	/// Print data to internal debug text character-buffer (VGA-compatible text mode).
 	/// </summary>
 	///
 	/// <param name="_x">Position x from the left corner of the window.</param>
 	/// <param name="_y">Position y from the top corner of the window.</param>
 	/// <param name="_attr">Color palette. Where top 4-bits represent index of background, and bottom 4-bits represent foreground color from standard VGA text palette (ANSI escape codes).</param>
-	/// <param name="_format">`printf` style format.</param>
+	/// <param name="_text">Text printed as is, with no printf formatting; null prints nothing.</param>
 	///
+	public static unsafe void DbgTextPrint(ushort _x, ushort _y, byte _attr, string _text) =>
+		DbgTextPrintfNative(_x, _y, _attr, (_text ?? string.Empty).Replace("%", "%%", StringComparison.Ordinal), null);
+
 	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_printf")]
-		public static unsafe partial void DbgTextPrintf(ushort _x,ushort _y,byte _attr,[MarshalAs(UnmanagedType.LPStr)] string _format,[MarshalAs(UnmanagedType.LPStr)] string args );
-	
-	/// <summary>
-	/// Print formatted data from variable argument list to internal debug text character-buffer (VGA-compatible text mode).
-	/// </summary>
-	///
-	/// <param name="_x">Position x from the left corner of the window.</param>
-	/// <param name="_y">Position y from the top corner of the window.</param>
-	/// <param name="_attr">Color palette. Where top 4-bits represent index of background, and bottom 4-bits represent foreground color from standard VGA text palette (ANSI escape codes).</param>
-	/// <param name="_format">`printf` style format.</param>
-	/// <param name="_argList">Variable arguments list for format string.</param>
-	///
-	[LibraryImport("bgfx", EntryPoint = "bgfx_dbg_text_vprintf")]
-		public static unsafe partial void DbgTextVprintf(ushort _x,ushort _y,byte _attr,[MarshalAs(UnmanagedType.LPStr)] string _format,IntPtr _argList);
+		private static unsafe partial void DbgTextPrintfNative(ushort _x,ushort _y,byte _attr,[MarshalAs(UnmanagedType.LPStr)] string _format,void* _varargs);
 	
 	/// <summary>
 	/// Draw image into internal debug text buffer.

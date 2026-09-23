@@ -15,15 +15,10 @@ internal sealed class ArrayParamPointerRewriter(C99Facts facts) : CSharpSyntaxRe
     {
         var visited = (MethodDeclarationSyntax)base.VisitMethodDeclaration(node)!;
 
-        var entryPoint = visited.AttributeLists
-            .SelectMany(al => al.Attributes)
-            .Where(a => a.Name.ToString().EndsWith("DllImport", StringComparison.Ordinal))
-            .SelectMany(a => a.ArgumentList?.Arguments ?? default)
-            .FirstOrDefault(a => a.NameEquals?.Name.Identifier.ValueText == "EntryPoint")
-            ?.Expression as LiteralExpressionSyntax;
+        var entryPoint = EntryPoints.Of(visited, "DllImport");
 
         if (entryPoint is null ||
-            !facts.ArrayParameters.TryGetValue(entryPoint.Token.ValueText, out var arrays))
+            !facts.ArrayParameters.TryGetValue(entryPoint, out var arrays))
         {
             return visited;
         }

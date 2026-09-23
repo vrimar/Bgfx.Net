@@ -28,7 +28,7 @@ return RunUnsafe(sdl, rendererOverride, maxFrames);
 
 static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFrames)
 {
-    var title = "BgfxApi.Net + SDL2"u8;
+    var title = "Bgfx.Net + SDL2"u8;
     Window* window;
     fixed (byte* titlePtr = title)
     {
@@ -97,8 +97,8 @@ static unsafe int RunUnsafe(Sdl sdl, RendererType? rendererOverride, int maxFram
 
                 BgfxApi.Touch(0);
                 BgfxApi.DbgTextClear(0, false);
-                BgfxApi.DbgTextPrintf(1, 1, 0x4f, "BgfxApi.Net + SDL2 sample", string.Empty);
-                BgfxApi.DbgTextPrintf(1, 2, 0x6f, $"Renderer: {BgfxApi.GetRendererType()}  ({currentW}x{currentH})", string.Empty);
+                BgfxApi.DbgTextPrint(1, 1, 0x4f, "Bgfx.Net + SDL2 sample");
+                BgfxApi.DbgTextPrint(1, 2, 0x6f, $"Renderer: {BgfxApi.GetRendererType()}  ({currentW}x{currentH})");
                 BgfxApi.Frame(0);
 
                 frames++;
