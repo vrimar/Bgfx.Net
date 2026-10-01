@@ -43,6 +43,11 @@ if (-not (Get-Command msbuild.exe -ErrorAction SilentlyContinue)) {
     Enter-VsDevShell -VsInstallPath $vsInstall -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64' | Out-Null
 }
 
+# __FILE__ names sources relative to the repo, and each binary names its PDB by file name only.
+$repoSlashed = "$repo" -replace '\\', '/'
+$env:CL = "$env:CL /d1trimfile:$repo /d1trimfile:$repoSlashed".Trim()
+$env:LINK = "$env:LINK /PDBALTPATH:%_PDB%".Trim()
+
 Write-Host "[build-native-win] genie --with-shared-lib --with-tools $VsAction"
 Push-Location $bgfx
 try {
@@ -105,6 +110,16 @@ if ($dumpbin) {
 else {
     Write-Warning "dumpbin.exe not in PATH; skipping symbol-export check."
 }
+
+foreach ($binary in Get-ChildItem $nativeOut, $toolsOut -Include '*.dll', '*.exe' -Recurse) {
+    $text = [System.Text.Encoding]::Latin1.GetString([System.IO.File]::ReadAllBytes($binary.FullName))
+    foreach ($root in @("$repo", $repoSlashed)) {
+        if ($text.IndexOf($root, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) {
+            Write-Error "$($binary.Name) embeds the build path $root."
+        }
+    }
+}
+Write-Host "[build-native-win] path check OK: no build paths in the staged binaries."
 
 # Reset $LASTEXITCODE — Format-Table / Get-ChildItem and dumpbin parse can leave it
 # non-zero even on success. Without this, pwsh exits with whatever was leftover.
