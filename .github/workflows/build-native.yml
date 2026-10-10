@@ -32,9 +32,8 @@ jobs:
             runner: windows-2022
             script: pwsh build/build-native-win.ps1
           - rid: linux-x64
-            # 24.04 ships GLIBC 2.39, satisfying the GLIBC_2.38 floor of bx's
-            # prebuilt genie binary. 22.04 (GLIBC 2.35) cannot load it.
-            runner: ubuntu-24.04
+            # The binaries inherit this runner's glibc floor; bx's prebuilt genie needs 2.38, so genie builds from source.
+            runner: ubuntu-22.04
             script: bash build/build-native-unix.sh linux-x64
             apt: 'libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev'
           # linux-arm64 is deferred — bx's linux-gcc x64 toolchain config
