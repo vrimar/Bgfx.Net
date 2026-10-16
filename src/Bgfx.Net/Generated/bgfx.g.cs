@@ -734,6 +734,8 @@ namespace Bgfx.Net
 		RtWriteOnly            = 0x0000008000000000,
 		RtShift                = 36,
 		RtMask                 = 0x000000f000000000,
+		MipCountShift          = 49,
+		MipCountMask           = 0x003e000000000000,
 	}
 
 [Flags]
@@ -1100,54 +1102,59 @@ namespace Bgfx.Net
 		RendererMultithreaded  = 0x0000000000000800,
 	
 		/// <summary>
+		/// 16-bit floats are supported in shaders.
+		/// </summary>
+		ShaderF16              = 0x0000000000001000,
+	
+		/// <summary>
 		/// Multiple windows are supported.
 		/// </summary>
-		SwapChain              = 0x0000000000001000,
+		SwapChain              = 0x0000000000002000,
 	
 		/// <summary>
 		/// Cubemap texture array is supported.
 		/// </summary>
-		TextureCubeArray       = 0x0000000000002000,
+		TextureCubeArray       = 0x0000000000004000,
 	
 		/// <summary>
 		/// CPU direct access to GPU texture memory.
 		/// </summary>
-		TextureDirectAccess    = 0x0000000000004000,
+		TextureDirectAccess    = 0x0000000000008000,
 	
 		/// <summary>
 		/// External texture is supported.
 		/// </summary>
-		TextureExternal        = 0x0000000000008000,
+		TextureExternal        = 0x0000000000010000,
 	
 		/// <summary>
 		/// External shared texture is supported.
 		/// </summary>
-		TextureExternalShared  = 0x0000000000010000,
+		TextureExternalShared  = 0x0000000000020000,
 	
 		/// <summary>
 		/// Transparent back buffer supported.
 		/// </summary>
-		TransparentBackbuffer  = 0x0000000000020000,
+		TransparentBackbuffer  = 0x0000000000040000,
 	
 		/// <summary>
 		/// Variable Rate Shading
 		/// </summary>
-		VariableRateShading    = 0x0000000000040000,
+		VariableRateShading    = 0x0000000000080000,
 	
 		/// <summary>
 		/// Vertex attribute 10_10_10_2 is supported.
 		/// </summary>
-		VertexAttribUint10     = 0x0000000000080000,
+		VertexAttribUint10     = 0x0000000000100000,
 	
 		/// <summary>
 		/// Hardware video decode is supported.
 		/// </summary>
-		VideoDecode            = 0x0000000000100000,
+		VideoDecode            = 0x0000000000200000,
 	
 		/// <summary>
 		/// Viewport layer is available in vertex shader.
 		/// </summary>
-		ViewportLayerArray     = 0x0000000000200000,
+		ViewportLayerArray     = 0x0000000000400000,
 	}
 
 [Flags]
@@ -2628,6 +2635,7 @@ public unsafe struct Caps
 			public uint MaxTransientVbSize;
 			public uint MaxTransientIbSize;
 			public uint MinUniformBufferSize;
+			public uint MinUniformCacheSize;
 			public uint BlitRowPitchAlign;
 			public uint BlitOffsetAlign;
 		}
@@ -2679,10 +2687,12 @@ public unsafe struct Init
 			public ushort MaxEncoders;
 			public uint NumDrawCalls;
 			public uint NumDrawCallPeakFrames;
+			public uint MinViews;
 			public uint MinResourceCbSize;
 			public uint MaxTransientVbSize;
 			public uint MaxTransientIbSize;
 			public uint MinUniformBufferSize;
+			public uint MinUniformCacheSize;
 		}
 	
 		public RendererType Type;
@@ -3910,7 +3920,7 @@ public static partial class Bgfx
 	///
 	/// <param name="_width">Width.</param>
 	/// <param name="_height">Height.</param>
-	/// <param name="_hasMips">Indicates that texture contains full mip-map chain.</param>
+	/// <param name="_hasMips">Indicates that texture contains full mip-map chain. Ignored when `BGFX_TEXTURE_MIP_COUNT` is set in _flags.</param>
 	/// <param name="_numLayers">Number of layers in texture array.</param>
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	/// <param name="_flags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
@@ -3926,7 +3936,7 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	/// <param name="_ratio">Texture size in respect to back-buffer size. See: `BackbufferRatio::Enum`.</param>
-	/// <param name="_hasMips">Indicates that texture contains full mip-map chain.</param>
+	/// <param name="_hasMips">Indicates that texture contains full mip-map chain. Ignored when `BGFX_TEXTURE_MIP_COUNT` is set in _flags.</param>
 	/// <param name="_numLayers">Number of layers in texture array.</param>
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	/// <param name="_flags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
@@ -3941,7 +3951,7 @@ public static partial class Bgfx
 	/// <param name="_width">Width.</param>
 	/// <param name="_height">Height.</param>
 	/// <param name="_depth">Depth.</param>
-	/// <param name="_hasMips">Indicates that texture contains full mip-map chain.</param>
+	/// <param name="_hasMips">Indicates that texture contains full mip-map chain. Ignored when `BGFX_TEXTURE_MIP_COUNT` is set in _flags.</param>
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	/// <param name="_flags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
 	/// <param name="_mem">Texture data. If `_mem` is non-NULL, created texture will be immutable. If `_mem` is NULL content of the texture is uninitialized. When `_numLayers` is more than 1, expected memory layout is texture and all mips together for each array element.</param>
@@ -3955,7 +3965,7 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	/// <param name="_size">Cube side size.</param>
-	/// <param name="_hasMips">Indicates that texture contains full mip-map chain.</param>
+	/// <param name="_hasMips">Indicates that texture contains full mip-map chain. Ignored when `BGFX_TEXTURE_MIP_COUNT` is set in _flags.</param>
 	/// <param name="_numLayers">Number of layers in texture array.</param>
 	/// <param name="_format">Texture format. See: `TextureFormat::Enum`.</param>
 	/// <param name="_flags">Texture creation (see `BGFX_TEXTURE_*`.), and sampler (see `BGFX_SAMPLER_*`) flags. Default texture sampling mode is linear, and wrap mode is repeat. - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap   mode. - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic   sampling.</param>
@@ -4366,10 +4376,10 @@ public static partial class Bgfx
 	/// 
 	///   In graphics debugger view name will appear as:
 	/// 
-	///       "nnnc <view name>"
-	///        ^  ^ ^
-	///        |  +--- compute (C)
-	///        +------ view id
+	///       "nnnnc <view name>"
+	///        ^   ^ ^
+	///        |   +--- compute (C)
+	///        +------- view id
 	/// 
 	/// </summary>
 	///
@@ -4461,7 +4471,8 @@ public static partial class Bgfx
 	/// <summary>
 	/// Set view clear flags with different clear color for each
 	/// frame buffer texture. `bgfx::setPaletteColor` must be used to set up a
-	/// clear color palette.
+	/// clear color palette. Frame buffer attachment with palette index set to
+	/// `UINT8_MAX` is not cleared.
 	/// </summary>
 	///
 	/// <param name="_id">View id.</param>
@@ -4521,7 +4532,9 @@ public static partial class Bgfx
 		public static unsafe partial void SetViewTransform(ushort _id,void* _view,void* _proj);
 	
 	/// <summary>
-	/// Post submit view reordering.
+	/// Post submit view reordering. A view in `_order` that currently renders
+	/// outside the remapped range swaps places with the view it displaces, so the
+	/// order stays a permutation of all view ids.
 	/// </summary>
 	///
 	/// <param name="_id">First view id.</param>
@@ -4545,7 +4558,7 @@ public static partial class Bgfx
 		public static unsafe partial void SetViewShadingRate(ushort _id,ShadingRate _shadingRate);
 	
 	/// <summary>
-	/// Reset all view settings to default.
+	/// Reset all view settings to default, including the view name.
 	/// </summary>
 	///
 	/// <param name="_id">_id View id.</param>
@@ -5001,9 +5014,11 @@ public static partial class Bgfx
 	/// <param name="_firstMip">First (most detailed) mip level.</param>
 	/// <param name="_numMips">Number of mip levels.</param>
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
+	/// <param name="_lodMin">Lowest (most detailed) level of detail the sampler may use, in quarter-mip steps, relative to `_firstMip`.</param>
+	/// <param name="_lodMax">Highest (least detailed) level of detail the sampler may use, in quarter-mip steps, relative to `_firstMip`. `UINT8_MAX` leaves it unclamped.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_encoder_set_texture_view")]
-		public static unsafe partial void EncoderSetTextureView(Encoder* _this,byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags);
+		public static unsafe partial void EncoderSetTextureView(Encoder* _this,byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags,byte _lodMin,byte _lodMax);
 	
 	/// <summary>
 	/// Submit an empty primitive for rendering. Uniforms and draw state
@@ -5323,7 +5338,7 @@ public static partial class Bgfx
 	/// </summary>
 	///
 	/// <param name="_handle">Frame buffer handle. If handle is `BGFX_INVALID_HANDLE` request will be made for main window back buffer.</param>
-	/// <param name="_filePath">Will be passed to `bgfx::CallbackI::screenShot` callback.</param>
+	/// <param name="_filePath">Will be passed to `bgfx::CallbackI::screenShot` callback. If the device is lost before the screenshot is taken, `bgfx::CallbackI::fatal` reports `Fatal::DeviceLost` in that frame and `screenShot` is not called for this request.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_request_screen_shot")]
 		public static unsafe partial void RequestScreenShot(FrameBufferHandle _handle,[MarshalAs(UnmanagedType.LPStr)] string _filePath);
@@ -5751,9 +5766,11 @@ public static partial class Bgfx
 	/// <param name="_firstMip">First (most detailed) mip level.</param>
 	/// <param name="_numMips">Number of mip levels.</param>
 	/// <param name="_flags">Texture sampling mode. Default value UINT32_MAX uses   texture sampling settings from the texture.   - `BGFX_SAMPLER_[U/V/W]_[MIRROR/CLAMP]` - Mirror or clamp to edge wrap     mode.   - `BGFX_SAMPLER_[MIN/MAG/MIP]_[POINT/ANISOTROPIC]` - Point or anisotropic     sampling.</param>
+	/// <param name="_lodMin">Lowest (most detailed) level of detail the sampler may use, in quarter-mip steps, relative to `_firstMip`.</param>
+	/// <param name="_lodMax">Highest (least detailed) level of detail the sampler may use, in quarter-mip steps, relative to `_firstMip`. `UINT8_MAX` leaves it unclamped.</param>
 	///
 	[LibraryImport("bgfx", EntryPoint = "bgfx_set_texture_view")]
-		public static unsafe partial void SetTextureView(byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags);
+		public static unsafe partial void SetTextureView(byte _stage,UniformHandle _sampler,TextureHandle _handle,ushort _firstLayer,ushort _numLayers,byte _firstMip,byte _numMips,uint _flags,byte _lodMin,byte _lodMax);
 	
 	/// <summary>
 	/// Submit an empty primitive for rendering. Uniforms and draw state

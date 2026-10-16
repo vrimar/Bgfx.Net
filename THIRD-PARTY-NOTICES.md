@@ -89,6 +89,7 @@ ship one file covering more than one license; every family found in that file is
 | libavif | bimg | Apache-2.0, BSD-3-Clause | external/bimg/3rdparty/libavif/LICENSE |
 | libsquish | bimg | MIT | external/bimg/3rdparty/libsquish/LICENSE |
 | lodepng | bimg | Zlib | external/bimg/3rdparty/lodepng/LICENSE |
+| nanosvg | bimg | Zlib | external/bimg/3rdparty/nanosvg/LICENSE |
 | nvtt | bimg | MIT | external/bimg/3rdparty/nvtt/NVIDIA_Texture_Tools_LICENSE.txt |
 | pvrtc | bimg | BSD-2-Clause | external/bimg/3rdparty/pvrtc/LICENSE.TXT |
 | simplewebp | bimg | BSD-3-Clause | external/bimg/3rdparty/simplewebp/LICENSE.md |
