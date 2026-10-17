@@ -135,6 +135,13 @@ cp -f "$GEOMETRYC" "$TOOLS_OUT/geometryc"
 
 chmod +x "$TOOLS_OUT/shaderc" "$TOOLS_OUT/texturec" "$TOOLS_OUT/geometryc"
 
+# Linux shaderc compiles HLSL through d3d4linux: Microsoft's d3dcompiler run under Wine.
+if [ "$RID" = "linux-x64" ]; then
+    mkdir -p "$TOOLS_OUT/windows"
+    cp -f "$BGFX/tools/bin/windows/d3d4linux.exe"      "$TOOLS_OUT/windows/"
+    cp -f "$BGFX/tools/bin/windows/d3dcompiler_47.dll" "$TOOLS_OUT/windows/"
+fi
+
 # Stage RID-agnostic shader headers so consumer .sc files can #include them.
 INCLUDE_OUT="$REPO/artifacts/tools/include"
 mkdir -p "$INCLUDE_OUT"

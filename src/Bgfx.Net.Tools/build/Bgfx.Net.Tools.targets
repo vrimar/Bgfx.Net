@@ -10,8 +10,8 @@
       </ItemGroup>
 
     Caveats:
-      - HLSL/DXBC compilation requires fxc.exe (Windows only). Build .sc shaders for
-        Direct3D on a Windows host.
+      - HLSL/DXBC compilation runs Microsoft's d3dcompiler_47.dll: natively on a Windows host,
+        and under Wine (wine on PATH) on a linux-x64 host, where the package ships it.
       - DXIL requires dxc.exe (cross-platform but distributed separately by Microsoft).
       - GLSL/ESSL/Metal/SPIR-V targets work cross-platform.
   -->
@@ -26,7 +26,9 @@
 
     <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('%(BgfxShader.Out)'))" />
 
+    <!-- Wine 11.10+ otherwise loads its own vkd3d d3dcompiler_47 in place of the shipped one. -->
     <Exec Command="&quot;$(BgfxShaderC)&quot; -f &quot;%(BgfxShader.FullPath)&quot; -o &quot;%(BgfxShader.Out)&quot; --type %(BgfxShader.Type) --platform %(BgfxShader.Platform) -p %(BgfxShader.Profile) -i &quot;$(BgfxShaderIncludePath)&quot;"
+          EnvironmentVariables="WINEDLLOVERRIDES=d3dcompiler_47=n"
           ConsoleToMSBuild="true" />
 
     <ItemGroup>

@@ -31,6 +31,9 @@
     <None Include="$(ToolsArtifactsDir)linux-x64\shaderc"        Pack="true" PackagePath="runtimes\linux-x64\native\shaderc"        Condition="Exists('$(ToolsArtifactsDir)linux-x64\shaderc')" />
     <None Include="$(ToolsArtifactsDir)linux-x64\texturec"       Pack="true" PackagePath="runtimes\linux-x64\native\texturec"       Condition="Exists('$(ToolsArtifactsDir)linux-x64\texturec')" />
     <None Include="$(ToolsArtifactsDir)linux-x64\geometryc"      Pack="true" PackagePath="runtimes\linux-x64\native\geometryc"      Condition="Exists('$(ToolsArtifactsDir)linux-x64\geometryc')" />
+    <!-- shaderc packs into native\shaderc\ and probes ..\windows\ for these. -->
+    <None Include="$(ToolsArtifactsDir)linux-x64\windows\d3d4linux.exe"      Pack="true" PackagePath="runtimes\linux-x64\native\windows\d3d4linux.exe"      Condition="Exists('$(ToolsArtifactsDir)linux-x64\windows\d3d4linux.exe')" />
+    <None Include="$(ToolsArtifactsDir)linux-x64\windows\d3dcompiler_47.dll" Pack="true" PackagePath="runtimes\linux-x64\native\windows\d3dcompiler_47.dll" Condition="Exists('$(ToolsArtifactsDir)linux-x64\windows\d3dcompiler_47.dll')" />
 
     <None Include="$(ToolsArtifactsDir)linux-arm64\shaderc"      Pack="true" PackagePath="runtimes\linux-arm64\native\shaderc"      Condition="Exists('$(ToolsArtifactsDir)linux-arm64\shaderc')" />
     <None Include="$(ToolsArtifactsDir)linux-arm64\texturec"     Pack="true" PackagePath="runtimes\linux-arm64\native\texturec"     Condition="Exists('$(ToolsArtifactsDir)linux-arm64\texturec')" />

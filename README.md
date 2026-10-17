@@ -100,8 +100,11 @@ dotnet build Bgfx.Net.sln
 ## Caveats
 
 - **Shaders on Linux/macOS**: `shaderc` can produce GLSL/ESSL/Metal/SPIR-V on all
-  platforms, but Direct3D shader compilation (DXBC via `fxc`, DXIL via `dxc`) needs
-  additional Windows-side tooling.
+  platforms. DXBC also builds on a linux-x64 host with `wine` on `PATH`: shaderc runs
+  Microsoft's `d3dcompiler_47.dll`, which `Bgfx.Net.Tools` ships beside it, under Wine.
+  Set `WINEDLLOVERRIDES=d3dcompiler_47=n` when invoking shaderc yourself, or Wine 11.10+
+  substitutes its own compiler. DXIL (via `dxc`) and DXBC on macOS still need
+  additional tooling.
 - **Threading**: bgfx uses an API thread + render thread model selected at `Init`.
   See bgfx's docs for the threading contract.
 - **Pinned to a specific bgfx revision**: The `Bgfx.Net` assembly is built against

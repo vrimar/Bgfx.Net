@@ -46,6 +46,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 (Same BSD-2-Clause terms as bgfx above.)
 
+## Direct3D shader compiler for Linux hosts
+
+`Bgfx.Net.Tools` ships two Windows binaries beside the linux-x64 `shaderc`, taken unchanged
+from bgfx's `tools/bin/windows`:
+
+- `d3d4linux.exe` — d3d4linux, WTFPL (see the inventory below).
+- `d3dcompiler_47.dll` — Microsoft's Direct3D HLSL Compiler for Redistribution, distributed
+  under the Windows SDK redistributable terms (https://learn.microsoft.com/en-us/legal/windows-sdk/redist).
+
 ## 3rd-party code bundled in the upstream submodules
 
 bgfx, bx, and bimg vendor additional 3rd-party libraries under `3rdparty/`. The table
