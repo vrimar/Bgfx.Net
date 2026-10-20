@@ -80,6 +80,9 @@ if ! grep -q -- '-lc++_shared' "$SHARED_MAKE"; then
 fi
 sed -i 's/-lc++_shared/-static-libstdc++ -Wl,--exclude-libs,libc++_static.a -Wl,--exclude-libs,libc++abi.a/g' "$SHARED_MAKE"
 
+# NDK r27 and older align LOAD segments to 4 KB, which a 16 KB-page device (Android 15+) cannot load.
+sed -i 's/-static-libstdc++/-Wl,-z,max-page-size=16384 &/g' "$SHARED_MAKE"
+
 # Named-arch Android actions use config=release; genie's gmake Makefiles reject
 # an unknown config, so probe with a dry run and fall back to release64.
 CONFIG="release"
@@ -118,6 +121,13 @@ if ! "$NDK_BIN/llvm-nm" -D --defined-only "$SO" 2>/dev/null | grep -E '\bbgfx_in
     echo "libbgfx.so does not export bgfx_init" >&2
     exit 1
 fi
+
+while read -r align; do
+    if ((align < 16384)); then
+        echo "libbgfx.so has a LOAD segment aligned to $align, below the 16 KB Android 15 pages need" >&2
+        exit 1
+    fi
+done < <("$NDK_BIN/llvm-readelf" -lW "$SO" | awk '$1 == "LOAD" { print $NF }')
 
 echo "[build-native-android] symbol check OK — $RID artifacts staged."
 ls -la "$NATIVE_OUT"
