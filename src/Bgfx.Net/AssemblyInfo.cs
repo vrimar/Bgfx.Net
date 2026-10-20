@@ -2,5 +2,5 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Bgfx.Net.Tests")]
-[assembly: AssemblyMetadata("BgfxRevision", "8da274db00b8b959c65f974a690b0f6247241674")]
-[assembly: AssemblyMetadata("BgfxApiVersion", "165")]
+[assembly: AssemblyMetadata("BgfxRevision", "1f5b2c84a2c755d8103da97dbbeca1b6de703238")]
+[assembly: AssemblyMetadata("BgfxApiVersion", "166")]
