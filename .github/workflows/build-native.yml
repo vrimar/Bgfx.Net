@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Checkout (with submodules)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
@@ -79,7 +79,7 @@ jobs:
 
       - name: Set up MSVC (Windows)
         if: matrix.rid == 'win-x64'
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Pin Android NDK
         if: startsWith(matrix.rid, 'android')
@@ -87,7 +87,7 @@ jobs:
 
       - name: Set up .NET
         if: matrix.workload
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ matrix.dotnet }}
 
@@ -101,7 +101,7 @@ jobs:
         run: ${{ matrix.script }}
 
       - name: Upload bgfx shared library
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bgfx-shared-${{ matrix.rid }}
           path: artifacts/native/${{ matrix.rid }}/
@@ -110,7 +110,7 @@ jobs:
 
       - name: Upload tools
         if: ${{ !startsWith(matrix.rid, 'android') && matrix.rid != 'browser-wasm' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bgfx-tools-${{ matrix.rid }}
           path: artifacts/tools/${{ matrix.rid }}/
