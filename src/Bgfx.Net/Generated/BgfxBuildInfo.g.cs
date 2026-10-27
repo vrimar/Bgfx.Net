@@ -5,8 +5,8 @@ namespace Bgfx.Net;
 public static class BgfxBuildInfo
 {
     /// <summary>The bgfx <c>BGFX_API_VERSION</c> the bundled native library implements.</summary>
-    public const int ApiVersion = 166;
+    public const int ApiVersion = 167;
 
     /// <summary>The pinned bgfx commit SHA.</summary>
-    public const string Revision = "1f5b2c84a2c755d8103da97dbbeca1b6de703238";
+    public const string Revision = "c272f6162bb013d4f5e95a4db399e37d561a4756";
 }
