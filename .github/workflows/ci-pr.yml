@@ -4,13 +4,14 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_call:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-pr-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-pr-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.workflow == 'ci-pr' }}
 
 jobs:
   managed:

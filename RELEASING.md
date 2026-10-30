@@ -45,19 +45,24 @@ Every release ships against exactly one bgfx commit. The pin is captured
 - The package's `<PackageReleaseNotes>`, auto-filled from `BGFX_API_VERSION` at pack
   time, so the gallery page always states the bundled API version.
 
-When writing the GitHub Release notes, copy these already-captured values through
-(SHA + `BGFX_API_VERSION`); you don't need to look them up by hand.
+When writing the version's `CHANGELOG.md` section, copy these already-captured values
+through (SHA + `BGFX_API_VERSION`); you don't need to look them up by hand.
 
 ## Release flow (tag-driven)
 
 The [`package` workflow](.github/workflows/package.yml) fires on any tag matching
-`v*`. It builds natives across all RIDs, regenerates bindings, packs both
-packages, and pushes to NuGet.org with `--skip-duplicate`.
+`v*`. It checks the version, runs the [`ci-pr` workflow](.github/workflows/ci-pr.yml),
+builds natives across all RIDs, regenerates bindings, packs both packages, pushes to
+NuGet.org with `--skip-duplicate`, and creates the GitHub Release.
 
 ### Prerequisites
 
-- `NUGET_API_KEY` repo secret set with push rights for `Bgfx.Net*` (Settings →
-  Secrets and variables → Actions). First push reserves the IDs.
+- A trusted publishing policy on nuget.org (account → Trusted Publishing) for owner
+  `vrimar`, repository `Bgfx.Net`, workflow `package.yml` and environment `nuget`.
+  `NuGet/login` trades the run's OIDC token for a short-lived API key, so there is no
+  key to store or rotate. Required reviewers on the `nuget` environment (Settings →
+  Environments) gate every push.
+- `CHANGELOG.md` has a `## [x.y.z] - YYYY-MM-DD` section for the version, on `main`.
 - `main` is green on CI.
 - Generated bindings (`src/Bgfx.Net/Generated/bgfx.g.cs`, `bgfx.raw.cs`) are
   committed and in sync with the submodule. The workflow fails the build if
@@ -66,22 +71,28 @@ packages, and pushes to NuGet.org with `--skip-duplicate`.
 
 ### Steps
 
-1. Decide the version (see policy above) and confirm `main` is the commit you
-   want to ship.
-2. Create and push an annotated tag:
+1. Decide the version (see policy above).
+2. Add its section to `CHANGELOG.md`, which becomes the GitHub Release's notes,
+   covering:
+   - What changed in the wrapper.
+   - bgfx pin: SHA + `BGFX_API_VERSION`.
+   - Any caveats (RID coverage, known issues).
+
+   Commit it to `main`, and confirm `main` is the commit you want to ship.
+3. Create and push an annotated tag:
    ```pwsh
    git tag -a v0.1.0 -m "v0.1.0"
    git push origin v0.1.0
    ```
-3. Watch the workflow run under Actions → **package**. It will:
+4. Watch the workflow run under Actions → **package**. It will:
+   - Fail unless the version is SemVer, `CHANGELOG.md` has its section, and the tag
+     is on `main`.
+   - Run the `ci-pr` checks and tests.
    - Build native `bgfx` for all RIDs (plus shader tools for the desktop RIDs).
    - Verify generated bindings match the submodule.
    - Pack `Bgfx.Net` and `Bgfx.Net.Tools`.
    - Push to NuGet.org.
-4. Once live, create a GitHub Release on the tag with notes covering:
-   - What changed in the wrapper.
-   - bgfx pin: SHA + `BGFX_API_VERSION`.
-   - Any caveats (RID coverage, known issues).
+   - Create the GitHub Release, marked as a prerelease when the version has a `-`.
 
 ### Dry run
 
@@ -89,7 +100,9 @@ To produce nupkgs without publishing (useful for verifying the build before the
 real tag):
 
 - GitHub UI → Actions → **package** → *Run workflow* → enter version, leave
-  **publish** unchecked. The nupkgs land as a workflow artifact.
+  **publish** unchecked. The nupkgs land as a workflow artifact. A dry run needs no
+  changelog section; checking **publish** requires one and pushes without creating a
+  GitHub Release.
 
 Locally (no native binaries — package will warn `BGFXNET001` and ship empty
 `runtimes/` folders, so only useful for sanity-checking the managed assembly):
@@ -122,6 +135,8 @@ upstream PR from a branch on the fork holding the same commit.
 
 - **Pack succeeded, push failed**: re-run the workflow. `--skip-duplicate` makes
   the push idempotent for nupkgs that already landed.
+- **Push succeeded, GitHub Release failed**: re-run failed jobs, which reruns the
+  release job alone.
 - **Pushed a bad package**: NuGet does not allow deletion, only *unlisting*.
   Unlist the bad version on nuget.org and ship a `+1` patch with the fix. Do not
   reuse the version number.

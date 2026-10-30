@@ -20,12 +20,65 @@ permissions:
   contents: read
 
 jobs:
+  version:
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      prerelease: ${{ steps.ver.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Derive and check the version
+        id: ver
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+          PUBLISHING: ${{ inputs.publish || startsWith(github.ref, 'refs/tags/v') }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          version="${INPUT_VERSION:-${GITHUB_REF_NAME#v}}"
+          semver='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
+          if [[ ! "$version" =~ $semver ]]; then
+            echo "::error::Version '$version' is not valid SemVer (expected e.g. 0.5.0 or 0.5.0-rc.1)."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+          awk -v head="## [$version]" 'index($0, head) == 1 { on = 1; next } on && /^## \[/ { exit } on' \
+            CHANGELOG.md > release-notes.md
+          if [ "$PUBLISHING" = true ]; then
+            if ! grep -q '[^[:space:]]' release-notes.md; then
+              echo "::error::CHANGELOG.md has no '## [$version]' section."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/$DEFAULT_BRANCH"; then
+              echo "::error::$GITHUB_SHA is not on $DEFAULT_BRANCH."
+              exit 1
+            fi
+          fi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: release-notes.md
+
+  ci:
+    needs: version
+    uses: ./.github/workflows/ci-pr.yml
+
   build-native:
+    needs: version
     uses: ./.github/workflows/build-native.yml
 
   pack:
     name: dotnet pack
-    needs: build-native
+    needs: [version, ci, build-native]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -77,26 +130,6 @@ jobs:
           cp -f external/bgfx/examples/common/shaderlib.sh artifacts/tools/include/
           find artifacts -type f
 
-      - name: Determine package version
-        id: version
-        run: |
-          if [ -n "${{ inputs.version }}" ]; then
-            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            echo "value=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
-          else
-            echo "value=0.0.0-ci.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Validate version is SemVer
-        run: |
-          v='${{ steps.version.outputs.value }}'
-          semver='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$'
-          if [[ ! "$v" =~ $semver ]]; then
-            echo "::error::Version '$v' is not valid SemVer (expected e.g. 0.5.0 or 0.5.0-rc.1)."
-            exit 1
-          fi
-
       - name: Sync bindings and regenerate (for reproducibility)
         run: |
           bash build/sync-bindings.sh
@@ -112,10 +145,12 @@ jobs:
           fi
 
       - name: Build and pack
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
-          dotnet build Bgfx.Net.sln -c Release -p:Version=${{ steps.version.outputs.value }} -p:SkipNativeWarning=true
-          dotnet pack src/Bgfx.Net/Bgfx.Net.csproj           -c Release -p:Version=${{ steps.version.outputs.value }} -o packages
-          dotnet pack src/Bgfx.Net.Tools/Bgfx.Net.Tools.csproj -c Release -p:Version=${{ steps.version.outputs.value }} -o packages
+          dotnet build Bgfx.Net.sln -c Release "-p:Version=$VERSION" -p:SkipNativeWarning=true
+          dotnet pack src/Bgfx.Net/Bgfx.Net.csproj           -c Release "-p:Version=$VERSION" -o packages
+          dotnet pack src/Bgfx.Net.Tools/Bgfx.Net.Tools.csproj -c Release "-p:Version=$VERSION" -o packages
 
       - name: Upload nupkgs
         uses: actions/upload-artifact@v7
@@ -128,6 +163,7 @@ jobs:
     needs: pack
     if: ${{ (inputs.publish == true) || startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-22.04
+    environment: nuget
     permissions:
       id-token: write
 
@@ -154,3 +190,28 @@ jobs:
           NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
         run: |
           dotnet nuget push 'packages/*.nupkg' --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
+
+  release:
+    name: GitHub Release
+    needs: [version, publish]
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download release notes
+        uses: actions/download-artifact@v8
+        with:
+          name: release-notes
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PRERELEASE_FLAG: ${{ needs.version.outputs.prerelease == 'true' && '--prerelease' || '' }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file release-notes.md \
+            $PRERELEASE_FLAG
