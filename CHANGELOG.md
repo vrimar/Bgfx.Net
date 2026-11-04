@@ -4,13 +4,17 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
-## [Unreleased]
+## [0.9.3] - 2026-11-04
+
+Fix release for the shader tools; `Bgfx.Net` is unchanged apart from its version.
 
 Shader tools (Bgfx.Net.Tools):
 - shaderc, texturec and geometryc move from `runtimes/<rid>/native/` to `tools/<rid>/` in the package, so they no longer get copied into the build and publish output of the app that references it. A project that hard-codes a path into the package must use `$(BgfxShaderC)`, `$(BgfxTextureC)` and `$(BgfxGeometryC)` instead.
 
 Packaging:
 - When the bgfx pin, native build scripts and compilers are unchanged, a release reuses the earlier build's win-x64, linux-x64 and osx binaries (bgfx and the shader tools) instead of rebuilding them, so they stay byte-identical across those releases. Android and browser-wasm still rebuild every release.
+
+bgfx pin: unchanged from 0.9.0, 028ed92929fd123fec638f9325ba14dfaf163ad2, BGFX_API_VERSION 167.
 
 ## [0.9.2] - 2026-11-04
 
