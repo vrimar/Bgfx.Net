@@ -91,6 +91,8 @@ NuGet.org with `--skip-duplicate`, and creates the GitHub Release.
    - Build native `bgfx` for all RIDs (plus shader tools for the desktop RIDs).
    - Verify generated bindings match the submodule.
    - Pack `Bgfx.Net` and `Bgfx.Net.Tools`.
+   - Build `tests/Bgfx.Net.Tools.Smoke` against the packed `Bgfx.Net.Tools` on Windows, Linux and macOS, as a
+     consumer would, so a tool path or command line that breaks on one OS stops the release.
    - Push to NuGet.org.
    - Create the GitHub Release, marked as a prerelease when the version has a `-`.
 

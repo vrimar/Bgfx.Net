@@ -1,0 +1,8 @@
+<Project>
+
+  <!-- A consumer pins its own Bgfx.Net.Tools version, outside the repo's central package versions. -->
+  <PropertyGroup>
+    <ImportDirectoryPackagesProps>false</ImportDirectoryPackagesProps>
+  </PropertyGroup>
+
+</Project>

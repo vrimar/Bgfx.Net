@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bgfx.Net.Tools" Version="$(BgfxNetToolsVersion)" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_SmokeShader Include="vs_smoke.sc" Type="vertex" />
+    <_SmokeShader Include="fs_smoke.sc" Type="fragment" />
+
+    <BgfxShader Include="@(_SmokeShader)" Platform="linux" Profile="spirv" Out="$(IntermediateOutputPath)shaders/spirv/%(Filename).bin" />
+    <BgfxShader Include="@(_SmokeShader)" Platform="osx" Profile="metal" Out="$(IntermediateOutputPath)shaders/metal/%(Filename).bin" />
+    <!-- shaderc on macOS has no HLSL compiler. -->
+    <BgfxShader Condition="!$([MSBuild]::IsOSPlatform('OSX'))" Include="@(_SmokeShader)" Platform="windows" Profile="s_5_0" Out="$(IntermediateOutputPath)shaders/s_5_0/%(Filename).bin" />
+  </ItemGroup>
+
+</Project>
