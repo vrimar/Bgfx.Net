@@ -74,6 +74,9 @@ jobs:
 
   build-native:
     needs: version
+    permissions:
+      contents: read
+      actions: read
     uses: ./.github/workflows/build-native.yml
 
   pack:

@@ -6,15 +6,16 @@ on:
   push:
     branches: [main]
     paths:
-      - 'external/bgfx/**'
-      - 'external/bx/**'
-      - 'external/bimg/**'
+      # A pin bump changes the submodule path itself (external/bgfx), which external/bgfx/** never matches.
+      - 'external/**'
       - 'build/build-native-*.sh'
       - 'build/build-native-*.ps1'
+      - 'src/Bgfx.Net/Native/**'
       - '.github/workflows/build-native.yml'
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: build-native-${{ github.workflow }}-${{ github.ref }}
@@ -31,11 +32,13 @@ jobs:
           - rid: win-x64
             runner: windows-2022
             script: pwsh build/build-native-win.ps1
+            reuse: true
           - rid: linux-x64
             # The binaries inherit this runner's glibc floor; bx's prebuilt genie needs 2.38, so genie builds from source.
             runner: ubuntu-22.04
             script: bash build/build-native-unix.sh linux-x64
             apt: 'libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev'
+            reuse: true
           # linux-arm64 is deferred — bx's linux-gcc x64 toolchain config
           # bakes in -m64/-msse4.2/-mfpmath=sse which arm64 gcc rejects, and
           # bx has no native linux-arm64-gcc action. Re-enable once we
@@ -47,9 +50,12 @@ jobs:
           - rid: osx-x64
             runner: macos-15
             script: bash build/build-native-unix.sh osx-x64
+            reuse: true
           - rid: osx-arm64
             runner: macos-15
             script: bash build/build-native-unix.sh osx-arm64
+            reuse: true
+          # No reuse: the NDK and emscripten versions float outside the fingerprint.
           - rid: android-arm64
             runner: ubuntu-24.04
             script: bash build/build-native-android.sh android-arm64
@@ -71,14 +77,70 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Fingerprint the native inputs
+        id: fingerprint
+        if: matrix.reuse
+        shell: bash
+        run: |
+          inputs="$RUNNER_TEMP/native-inputs.txt"
+          {
+            git ls-tree -r HEAD -- external build/build-native-* .github/workflows/build-native.yml
+            case "$RUNNER_OS" in
+              Windows)
+                vs=$(cygpath -u "$("/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -property installationPath | tr -d '\r')")
+                tr -d '\r' < "$vs/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt"
+                ls -d "/c/Program Files (x86)/Windows Kits/10/Include"/10.* | sort -V | tail -n 1
+                ;;
+              Linux)
+                gcc --version | sed -n 1p
+                ld --version | sed -n 1p
+                ldd --version | sed -n 1p
+                ;;
+              macOS)
+                xcodebuild -version
+                xcrun --show-sdk-version
+                ;;
+            esac
+          } > "$inputs"
+          cat "$inputs"
+          hash=$(git hash-object "$inputs")
+          echo "name=bgfx-native-${{ matrix.rid }}-$hash" >> "$GITHUB_OUTPUT"
+
+      - name: Find an earlier build of the same inputs
+        id: earlier
+        if: matrix.reuse
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NAME: ${{ steps.fingerprint.outputs.name }}
+          RID: ${{ matrix.rid }}
+        # Fork PR runs upload artifacts into this repo too; only the repo's own runs are trusted.
+        run: |
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=$NAME&per_page=100" --jq '
+            [.artifacts[] | select(.expired | not) | select(.workflow_run.head_repository_id == .workflow_run.repository_id)]
+            | first | .workflow_run.id // empty')
+          echo "run-id=$run" >> "$GITHUB_OUTPUT"
+          if [ -n "$run" ]; then
+            echo "::notice::$RID reuses $NAME from run $run"
+          fi
+
+      - name: Download the earlier build
+        if: steps.earlier.outputs.run-id
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ steps.fingerprint.outputs.name }}
+          run-id: ${{ steps.earlier.outputs.run-id }}
+          github-token: ${{ github.token }}
+          path: artifacts/
+
       - name: Install Linux build dependencies
-        if: matrix.apt
+        if: matrix.apt && !steps.earlier.outputs.run-id
         run: |
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.apt }}
 
       - name: Set up MSVC (Windows)
-        if: matrix.rid == 'win-x64'
+        if: matrix.rid == 'win-x64' && !steps.earlier.outputs.run-id
         uses: microsoft/setup-msbuild@v3
 
       - name: Pin Android NDK
@@ -97,8 +159,20 @@ jobs:
         run: cd "$RUNNER_TEMP" && dotnet workload install ${{ matrix.workload }}
 
       - name: Build native + tools (${{ matrix.rid }})
+        if: ${{ !steps.earlier.outputs.run-id }}
         shell: bash
         run: ${{ matrix.script }}
+
+      - name: Upload for later runs
+        if: matrix.reuse && !steps.earlier.outputs.run-id
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.fingerprint.outputs.name }}
+          path: |
+            artifacts/native/${{ matrix.rid }}/
+            artifacts/tools/${{ matrix.rid }}/
+          if-no-files-found: error
+          retention-days: 90
 
       - name: Upload bgfx shared library
         uses: actions/upload-artifact@v7
