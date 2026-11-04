@@ -4,6 +4,19 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
+## [0.9.2] - 2026-11-04
+
+Fix release for the shader tools; `Bgfx.Net` is unchanged apart from its version.
+
+Shader tools (Bgfx.Net.Tools):
+- A project that only references the package and adds `BgfxShader` items now compiles on Windows, Linux and macOS. Two bugs stopped it on every OS:
+  - On .NET SDK 10 the package's props ran before the SDK defined its RID, so the tool paths had no RID in them and shaderc was "not found".
+  - On Linux and macOS each tool sits in a folder of its own name, `native/shaderc/shaderc`, but the props pointed at the folder.
+- `BgfxShaderC`, `BgfxTextureC` and `BgfxGeometryC` now get their defaults in the package's targets, not its props. Setting them in your project still overrides them; reading them in your project's own properties now finds them empty.
+- Every release first builds a consumer project against the packed tools on Windows, Linux and macOS.
+
+bgfx pin: unchanged from 0.9.0, 028ed92929fd123fec638f9325ba14dfaf163ad2, BGFX_API_VERSION 167.
+
 ## [0.9.1] - 2026-11-04
 
 Fix release for the shader tools; `Bgfx.Net` is unchanged apart from its version.
