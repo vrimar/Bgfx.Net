@@ -60,8 +60,7 @@ NuGet.org with `--skip-duplicate`, and creates the GitHub Release.
 - A trusted publishing policy on nuget.org (account → Trusted Publishing) for owner
   `vrimar`, repository `Bgfx.Net`, workflow `package.yml` and environment `nuget`.
   `NuGet/login` trades the run's OIDC token for a short-lived API key, so there is no
-  key to store or rotate. Required reviewers on the `nuget` environment (Settings →
-  Environments) gate every push.
+  key to store or rotate.
 - `CHANGELOG.md` has a `## [x.y.z] - YYYY-MM-DD` section for the version, on `main`.
 - `main` is green on CI.
 - Generated bindings (`src/Bgfx.Net/Generated/bgfx.g.cs`, `bgfx.raw.cs`) are
