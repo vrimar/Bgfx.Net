@@ -27,7 +27,8 @@
     <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('%(BgfxShader.Out)'))" />
 
     <!-- Wine 11.10+ otherwise loads its own vkd3d d3dcompiler_47 in place of the shipped one. -->
-    <Exec Command="&quot;$(BgfxShaderC)&quot; -f &quot;%(BgfxShader.FullPath)&quot; -o &quot;%(BgfxShader.Out)&quot; --type %(BgfxShader.Type) --platform %(BgfxShader.Platform) -p %(BgfxShader.Profile) -i &quot;$(BgfxShaderIncludePath)&quot;"
+    <!-- On Windows a trailing backslash before the closing quote escapes it, so -i swallows the quote. -->
+    <Exec Command="&quot;$(BgfxShaderC)&quot; -f &quot;%(BgfxShader.FullPath)&quot; -o &quot;%(BgfxShader.Out)&quot; --type %(BgfxShader.Type) --platform %(BgfxShader.Platform) -p %(BgfxShader.Profile) -i &quot;$(BgfxShaderIncludePath.TrimEnd('\'))&quot;"
           EnvironmentVariables="WINEDLLOVERRIDES=d3dcompiler_47=n"
           ConsoleToMSBuild="true" />
 

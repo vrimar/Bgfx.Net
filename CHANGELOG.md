@@ -4,6 +4,15 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
+## [0.9.1] - 2026-11-04
+
+Fix release for the shader tools; `Bgfx.Net` is unchanged apart from its version.
+
+Shader tools (Bgfx.Net.Tools):
+- `BgfxCompileShaders` compiles on a Windows host. The default `BgfxShaderIncludePath` ends in a backslash, which escaped the closing quote of shaderc's `-i`, so every shader failed with "Could not open include file 'bgfx_shader.sh'". A path you set yourself may end in a backslash too.
+
+bgfx pin: unchanged from 0.9.0, 028ed92929fd123fec638f9325ba14dfaf163ad2, BGFX_API_VERSION 167.
+
 ## [0.9.0] - 2026-10-30
 
 Breaking release: bgfx moves to API 167, which reports MSAA support per sample count. On Linux, shaderc's Direct3D shaders now declare only the uniforms they read, and shaderc rejects instance data on the wrong semantic.
