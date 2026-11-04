@@ -87,7 +87,8 @@ NuGet.org with `--skip-duplicate`, and creates the GitHub Release.
    - Fail unless the version is SemVer, `CHANGELOG.md` has its section, and the tag
      is on `main`.
    - Run the `ci-pr` checks and tests.
-   - Build native `bgfx` for all RIDs (plus shader tools for the desktop RIDs).
+   - Build native `bgfx` for all RIDs (plus shader tools for the desktop RIDs). A desktop RID reuses
+     an earlier run's build, up to 90 days old, when its pins, build scripts and compilers match.
    - Verify generated bindings match the submodule.
    - Pack `Bgfx.Net` and `Bgfx.Net.Tools`.
    - Build `tests/Bgfx.Net.Tools.Smoke` against the packed `Bgfx.Net.Tools` on Windows, Linux and macOS, as a
