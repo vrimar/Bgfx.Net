@@ -19,7 +19,7 @@
   <!-- The host's RID, not $(RuntimeIdentifier); an SDK may define it only after package props, so it resolves here. -->
   <PropertyGroup>
     <_BgfxNetToolsHostRid Condition="'$(_BgfxNetToolsHostRid)' == ''">$(NETCoreSdkPortableRuntimeIdentifier)</_BgfxNetToolsHostRid>
-    <_BgfxNetToolsRoot>$(MSBuildThisFileDirectory)..\runtimes\$(_BgfxNetToolsHostRid)\native\</_BgfxNetToolsRoot>
+    <_BgfxNetToolsRoot>$(MSBuildThisFileDirectory)..\tools\$(_BgfxNetToolsHostRid)\</_BgfxNetToolsRoot>
   </PropertyGroup>
 
   <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
