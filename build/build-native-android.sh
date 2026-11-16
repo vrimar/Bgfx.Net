@@ -63,9 +63,12 @@ fi
 
 NPROC="$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)"
 
-echo "[build-native-android] cd $BGFX && genie $GCC_FLAG --with-shared-lib gmake"
+# bx defaults to API 34; the consuming app's minimum, not this library, should set the floor.
+ANDROID_API=24
+
+echo "[build-native-android] cd $BGFX && genie $GCC_FLAG --with-android=$ANDROID_API --with-shared-lib gmake"
 cd "$BGFX"
-"$GENIE" "$GCC_FLAG" --with-shared-lib gmake
+"$GENIE" "$GCC_FLAG" --with-android="$ANDROID_API" --with-shared-lib gmake
 
 # bx's android config links the C++ runtime dynamically (-lc++_shared), leaving
 # libbgfx.so with a runtime dependency on libc++_shared.so that consumers would
