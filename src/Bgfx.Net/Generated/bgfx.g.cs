@@ -623,6 +623,39 @@ namespace Bgfx.Net
 	}
 
 [Flags]
+	public enum DiagnosticFlags : uint
+	{
+		/// <summary>
+		/// No diagnostics.
+		/// </summary>
+		None                   = 0x00000000,
+	
+		/// <summary>
+		/// Report informational debug layer messages, not only warnings and errors.
+		/// Requires `Init::debug`.
+		/// </summary>
+		Verbose                = 0x00000001,
+	
+		/// <summary>
+		/// Enable GPU-based validation (D3D12 GPU-based validation, Vulkan GPU-assisted
+		/// validation). Requires `Init::debug`.
+		/// </summary>
+		GpuValidation          = 0x00000002,
+	
+		/// <summary>
+		/// Enable queue synchronization validation (D3D12 synchronized command queue
+		/// validation, Vulkan synchronization validation). Requires `Init::debug`.
+		/// </summary>
+		SyncValidation         = 0x00000004,
+	
+		/// <summary>
+		/// Wait for the GPU to finish each submitted command buffer before recording
+		/// the next one.
+		/// </summary>
+		Serialize              = 0x00000008,
+	}
+
+[Flags]
 	public enum BufferFlags : ushort
 	{
 		None                   = 0x0000,
@@ -1443,14 +1476,19 @@ namespace Bgfx.Net
 		Apple                  = 0x106b,
 	
 		/// <summary>
+		/// ARM adapter.
+		/// </summary>
+		Arm                    = 0x13b5,
+	
+		/// <summary>
+		/// Google adapter.
+		/// </summary>
+		Google                 = 0x1ae0,
+	
+		/// <summary>
 		/// Intel adapter.
 		/// </summary>
 		Intel                  = 0x8086,
-	
-		/// <summary>
-		/// NVIDIA adapter.
-		/// </summary>
-		Nvidia                 = 0x10de,
 	
 		/// <summary>
 		/// Microsoft adapter.
@@ -1458,9 +1496,9 @@ namespace Bgfx.Net
 		Microsoft              = 0x1414,
 	
 		/// <summary>
-		/// ARM adapter.
+		/// NVIDIA adapter.
 		/// </summary>
-		Arm                    = 0x13b5,
+		Nvidia                 = 0x10de,
 	}
 
 [Flags]
@@ -2669,8 +2707,8 @@ public unsafe struct Caps
 			public uint MaxOcclusionQueries;
 			public uint MaxEncoders;
 			public uint MinResourceCbSize;
-			public uint MaxTransientVbSize;
-			public uint MaxTransientIbSize;
+			public uint MinTransientVbSize;
+			public uint MinTransientIbSize;
 			public uint MinUniformBufferSize;
 			public uint MinUniformCacheSize;
 			public uint BlitRowPitchAlign;
@@ -2726,17 +2764,19 @@ public unsafe struct Init
 			public uint NumDrawCallPeakFrames;
 			public uint MinViews;
 			public uint MinResourceCbSize;
-			public uint MaxTransientVbSize;
-			public uint MaxTransientIbSize;
+			public uint MinTransientVbSize;
+			public uint MinTransientIbSize;
 			public uint MinUniformBufferSize;
 			public uint MinUniformCacheSize;
 		}
 	
 		public RendererType Type;
+		public RendererType BackendType;
 		public ushort VendorId;
 		public ushort DeviceId;
 		public ulong Capabilities;
 		public byte Debug;
+		public uint Diagnostics;
 		public byte Profile;
 		public byte Fallback;
 		public byte VideoDecode;
@@ -5287,6 +5327,10 @@ public static partial class Bgfx
 	/// 
 	/// @attention Destination texture must be created with `BGFX_TEXTURE_BLIT_DST` flag.
 	/// 
+	/// @attention A depth texture, or one created with `BGFX_TEXTURE_MSAA_SAMPLE`, can only
+	///   be blitted whole: both sides start at the origin of mips of the same size, and
+	///   the copy covers the whole mip.
+	/// 
 	/// </summary>
 	///
 	/// <param name="_id">View id.</param>
@@ -6036,6 +6080,10 @@ public static partial class Bgfx
 	///   draw commands are executed after blit and compute commands.
 	/// 
 	/// @attention Destination texture must be created with `BGFX_TEXTURE_BLIT_DST` flag.
+	/// 
+	/// @attention A depth texture, or one created with `BGFX_TEXTURE_MSAA_SAMPLE`, can only
+	///   be blitted whole: both sides start at the origin of mips of the same size, and
+	///   the copy covers the whole mip.
 	/// 
 	/// </summary>
 	///
