@@ -64,12 +64,10 @@ jobs:
             runner: ubuntu-24.04
             script: bash build/build-native-android.sh android-x64
             apt: 'patchelf'
-          # The emdawnwebgpu port exists only in the .NET 11 emscripten; global.json pins SDK 10.
           - rid: browser-wasm
             runner: ubuntu-24.04
             script: bash build/build-native-wasm.sh
             workload: wasm-tools
-            dotnet: 11.0.100-rc.1.26425.128
 
     steps:
       - name: Checkout (with submodules)
@@ -151,7 +149,7 @@ jobs:
         if: matrix.workload
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ matrix.dotnet }}
+          global-json-file: global.json
 
       - name: Install .NET workload (${{ matrix.workload }})
         if: matrix.workload
