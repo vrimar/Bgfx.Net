@@ -4,6 +4,47 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
+## [0.10.0] - 2026-11-16
+
+Breaking release: bgfx moves to API 169, where transient buffers grow on demand and Direct3D 12 is the default renderer on Windows. Shaders compiled by this release's shaderc load only in this release's `Bgfx.Net` or later.
+
+Breaking managed API changes:
+- `Init.Limits` and `Caps.Limits` rename `MaxTransientVbSize` and `MaxTransientIbSize` to `MinTransientVbSize` and `MinTransientIbSize`. Transient buffers start at that size and grow on demand.
+
+Behaviour changes:
+- On Windows, an `Init` that leaves `Type` at `RendererType.Count` gets Direct3D 12 instead of Direct3D 11, and Windows 10 is the minimum. Set `RendererType.Direct3D11` to keep the old renderer.
+- Blits between a buffer and a multisampled texture are rejected, and a depth texture or one created with `TextureFlags.MsaaSample` can only be blitted a whole mip at a time.
+
+New:
+- `Init.Diagnostics` takes `DiagnosticFlags`: `Verbose`, `GpuValidation` and `SyncValidation` turn on more of the debug layer and need `Init.Debug`; `Serialize` waits for the GPU after each command buffer.
+- `Init.BackendType` picks the native API a layered renderer (WebGPU) runs on.
+- `PciIdFlags.Google`.
+- `ResetFlags.TransparentBackbuffer` works on Direct3D 11 and 12 (through DirectComposition), Metal and WebGPU.
+
+Shader tools (Bgfx.Net.Tools):
+- shaderc writes shader binary version 14, which stores uniform array sizes in 16 bits, so arrays of more than 255 elements compile. This release's `Bgfx.Net` still loads shaders built by earlier shaderc; earlier `Bgfx.Net` cannot load shaders built by this one.
+- shaderc's preprocessor is faster.
+- texturec decodes PNGs under 8 bits per channel, grayscale images decoded to a color format, HDR images built with GCC 15, and compressed images that aren't a multiple of the block size correctly, and no longer overflows on very large images.
+
+bgfx changes:
+- Direct3D 12, Vulkan and WebGPU: mip generation, blit and swap chain fixes, and cube and MSAA cube render targets resolve correctly.
+- Integer color attachments blend and clear correctly, including partial clears on Metal and WebGPU.
+- Vulkan: vsync turns off on drivers without the IMMEDIATE present mode, aliased lines use Bresenham rasterization, and zero-area swap chains are deferred.
+- Direct3D 12: wireframe and a scratch descriptor heap overflow are fixed.
+- Metal: anisotropy without a main swap chain, depth texture sampling and user uniforms are fixed, and float32 and RGB9E5 formats generate mips.
+- GL and GLES: texture to buffer blits, image layer binding, the ASTC probe and EGL swap chain contexts are fixed.
+- WebGPU: bind group, callback and browser fixes.
+- Texture copies and sampling on Mali are fixed.
+
+bgfx fixes carried on the fork:
+- Kept: VK/WebGPU compute-only views in the view stats, and the two shaderc fixes from v0.9.0.
+- The WGPU external device through `PlatformData::context` has landed upstream and is no longer carried.
+
+Packaging:
+- The Android libraries are still built for API 24 (Android 7.0), though bx now defaults to API 34.
+
+bgfx pin: c1340445ea150112f52393ef1cd586e735fa60fb (bgfx.net branch: upstream 3aab3201a plus the three fixes above), BGFX_API_VERSION 169. bx and bimg move to upstream 93ab098 and f091e14.
+
 ## [0.9.3] - 2026-11-04
 
 Fix release for the shader tools; `Bgfx.Net` is unchanged apart from its version.
