@@ -11,9 +11,15 @@ OpenGL, OpenGL ES, and Metal backends.
 | `Bgfx.Net` | Managed bindings + native `bgfx` shared library for all supported RIDs |
 | `Bgfx.Net.Tools` | MSBuild integration that runs `shaderc` / `texturec` / `geometryc` at build time. Marked `developmentDependency`, so it doesn't propagate into consumer output. |
 
-Supported RIDs: `win-x64`, `linux-x64`, `osx-x64`, `osx-arm64`, `android-arm64`,
-`android-x64`, `browser-wasm`. (`linux-arm64` is planned — blocked on upstream bx adding a native
-`linux-arm64-gcc` action.)
+## Supported platforms
+
+| Platform | RIDs | Renderers | Minimum |
+|---|---|---|---|
+| Windows | `win-x64` | Direct3D 12, Direct3D 11, Vulkan, OpenGL, WebGPU | Windows 10 |
+| Linux | `linux-x64` | Vulkan, OpenGL, WebGPU, Direct3D 12 (WSL) | glibc 2.35 |
+| macOS | `osx-x64`, `osx-arm64` | Metal, Vulkan (needs MoltenVK), WebGPU | macOS 11 |
+| Android | `android-arm64`, `android-x64` | Vulkan, OpenGL ES | API 24 (Android 7.0) |
+| Browser | `browser-wasm` | WebGPU | A browser with WebGPU |
 
 On Android the native `libbgfx.so` is shipped under `runtimes/android-arm64/native`
 and `runtimes/android-x64/native`; a `net*-android` app that references the package
