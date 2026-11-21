@@ -107,6 +107,15 @@ echo "[build-native-unix] cd $BGFX && genie $GCC_FLAG ${GENIE_EXTRA:-} --with-sh
 cd "$BGFX"
 "$GENIE" "$GCC_FLAG" ${GENIE_EXTRA:-} --with-shared-lib --with-tools gmake
 
+if [ "$RID" = "linux-arm64" ]; then
+    # bx applies x86-only flags to every linux-gcc build, and aarch64 gcc rejects them.
+    sed -i 's/ -m64//g; s/ -msse4\.2//g; s/ -mfpmath=sse//g' "$PROJ_DIR"/*.make
+    if grep -lE -- '-m64|-msse|-mfpmath' "$PROJ_DIR"/*.make; then
+        echo "x86-only flags remain in the makefiles above; bx's linux-gcc flags changed" >&2
+        exit 1
+    fi
+fi
+
 echo "[build-native-unix] make -C $PROJ_DIR config=$CONFIG bgfx-shared-lib shaderc texturec geometryc -j$NPROC"
 make -C "$PROJ_DIR" "config=$CONFIG" bgfx-shared-lib shaderc texturec geometryc -j"$NPROC"
 

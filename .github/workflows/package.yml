@@ -167,7 +167,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, ubuntu-24.04, macos-15]
+        os: [windows-2022, windows-11-arm, ubuntu-24.04, ubuntu-24.04-arm, macos-15]
     runs-on: ${{ matrix.os }}
     env:
       WINEDEBUG: -all
@@ -184,7 +184,7 @@ jobs:
           global-json-file: global.json
 
       - name: Install wine
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && runner.arch == 'X64'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wine wine64

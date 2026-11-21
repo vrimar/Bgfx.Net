@@ -8,7 +8,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>Bgfx.Net</PackageId>
-    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, linux-x64, osx-x64, osx-arm64, android-arm64, android-x64, ios-arm64, iossimulator-arm64, and browser-wasm.</Description>
+    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, win-arm64, linux-x64, linux-arm64, osx-x64, osx-arm64, android-arm64, android-x64, ios-arm64, iossimulator-arm64, and browser-wasm.</Description>
     <PackageTags>bgfx;graphics;rendering;vulkan;metal;directx;opengl;native;ios</PackageTags>
 
     <IsAotCompatible>true</IsAotCompatible>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <None Include="$(NativeArtifactsDir)win-x64\bgfx.dll"          Pack="true" PackagePath="runtimes\win-x64\native\bgfx.dll"          Condition="Exists('$(NativeArtifactsDir)win-x64\bgfx.dll')" />
+    <None Include="$(NativeArtifactsDir)win-arm64\bgfx.dll"        Pack="true" PackagePath="runtimes\win-arm64\native\bgfx.dll"        Condition="Exists('$(NativeArtifactsDir)win-arm64\bgfx.dll')" />
     <None Include="$(NativeArtifactsDir)linux-x64\libbgfx.so"      Pack="true" PackagePath="runtimes\linux-x64\native\libbgfx.so"      Condition="Exists('$(NativeArtifactsDir)linux-x64\libbgfx.so')" />
     <None Include="$(NativeArtifactsDir)linux-arm64\libbgfx.so"    Pack="true" PackagePath="runtimes\linux-arm64\native\libbgfx.so"    Condition="Exists('$(NativeArtifactsDir)linux-arm64\libbgfx.so')" />
     <None Include="$(NativeArtifactsDir)osx-x64\libbgfx.dylib"     Pack="true" PackagePath="runtimes\osx-x64\native\libbgfx.dylib"     Condition="Exists('$(NativeArtifactsDir)osx-x64\libbgfx.dylib')" />

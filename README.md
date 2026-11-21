@@ -15,8 +15,8 @@ OpenGL, OpenGL ES, and Metal backends.
 
 | Platform | RIDs | Renderers | Minimum |
 |---|---|---|---|
-| Windows | `win-x64` | Direct3D 12, Direct3D 11, Vulkan, OpenGL, WebGPU | Windows 10 |
-| Linux | `linux-x64` | Vulkan, OpenGL, WebGPU, Direct3D 12 (WSL) | glibc 2.35 |
+| Windows | `win-x64`, `win-arm64` | Direct3D 12, Direct3D 11, Vulkan, OpenGL, WebGPU | Windows 10 |
+| Linux | `linux-x64`, `linux-arm64` | Vulkan, OpenGL, WebGPU, Direct3D 12 (WSL) | glibc 2.35 |
 | macOS | `osx-x64`, `osx-arm64` | Metal, Vulkan (needs MoltenVK), WebGPU | macOS 11 |
 | Android | `android-arm64`, `android-x64` | Vulkan, OpenGL ES | API 24 (Android 7.0) |
 | iOS | `ios-arm64`, `iossimulator-arm64` | Metal | iOS 16, NativeAOT |
@@ -115,8 +115,8 @@ dotnet build Bgfx.Net.sln
   platforms. DXBC also builds on a linux-x64 host with `wine` on `PATH`: shaderc runs
   Microsoft's `d3dcompiler_47.dll`, which `Bgfx.Net.Tools` ships beside it, under Wine.
   Set `WINEDLLOVERRIDES=d3dcompiler_47=n` when invoking shaderc yourself, or Wine 11.10+
-  substitutes its own compiler. DXIL (via `dxc`) and DXBC on macOS still need
-  additional tooling.
+  substitutes its own compiler. DXIL (via `dxc`) and DXBC on macOS or a linux-arm64 host
+  still need additional tooling.
 - **Threading**: bgfx uses an API thread + render thread model selected at `Init`.
   See bgfx's docs for the threading contract.
 - **Pinned to a specific bgfx revision**: The `Bgfx.Net` assembly is built against

@@ -29,6 +29,10 @@
     <None Include="$(ToolsArtifactsDir)win-x64\texturec.exe"     Pack="true" PackagePath="tools\win-x64\texturec.exe"    Condition="Exists('$(ToolsArtifactsDir)win-x64\texturec.exe')" />
     <None Include="$(ToolsArtifactsDir)win-x64\geometryc.exe"    Pack="true" PackagePath="tools\win-x64\geometryc.exe"   Condition="Exists('$(ToolsArtifactsDir)win-x64\geometryc.exe')" />
 
+    <None Include="$(ToolsArtifactsDir)win-arm64\shaderc.exe"    Pack="true" PackagePath="tools\win-arm64\shaderc.exe"   Condition="Exists('$(ToolsArtifactsDir)win-arm64\shaderc.exe')" />
+    <None Include="$(ToolsArtifactsDir)win-arm64\texturec.exe"   Pack="true" PackagePath="tools\win-arm64\texturec.exe"  Condition="Exists('$(ToolsArtifactsDir)win-arm64\texturec.exe')" />
+    <None Include="$(ToolsArtifactsDir)win-arm64\geometryc.exe"  Pack="true" PackagePath="tools\win-arm64\geometryc.exe" Condition="Exists('$(ToolsArtifactsDir)win-arm64\geometryc.exe')" />
+
     <None Include="$(ToolsArtifactsDir)linux-x64\shaderc"        Pack="true" PackagePath="tools\linux-x64\shaderc"        Condition="Exists('$(ToolsArtifactsDir)linux-x64\shaderc')" />
     <None Include="$(ToolsArtifactsDir)linux-x64\texturec"       Pack="true" PackagePath="tools\linux-x64\texturec"       Condition="Exists('$(ToolsArtifactsDir)linux-x64\texturec')" />
     <None Include="$(ToolsArtifactsDir)linux-x64\geometryc"      Pack="true" PackagePath="tools\linux-x64\geometryc"      Condition="Exists('$(ToolsArtifactsDir)linux-x64\geometryc')" />

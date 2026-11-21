@@ -1,17 +1,23 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Builds bgfx-shared-lib + shaderc/texturec/geometryc for win-x64 (MSVC).
+    Builds bgfx-shared-lib + shaderc/texturec/geometryc for win-x64 or win-arm64 (MSVC).
 
 .DESCRIPTION
     Invokes the upstream genie + msbuild flow with --with-shared-lib --with-tools,
-    then stages the produced binaries into artifacts/native/win-x64/ and
-    artifacts/tools/win-x64/ with canonical filenames.
+    then stages the produced binaries into artifacts/native/<rid>/ and
+    artifacts/tools/<rid>/ with canonical filenames.
+
+.PARAMETER Rid
+    win-x64 (default) or win-arm64.
 
 .PARAMETER Configuration
     Release (default) or Debug. Bgfx.Net ships Release only.
 #>
 param(
+    [ValidateSet('win-x64', 'win-arm64')]
+    [string]$Rid = 'win-x64',
+
     [ValidateSet('Release', 'Debug')]
     [string]$Configuration = 'Release',
 
@@ -23,6 +29,11 @@ $ErrorActionPreference = 'Stop'
 $repo = Resolve-Path "$PSScriptRoot/.."
 $bgfx = Join-Path $repo 'external/bgfx'
 $genie = Join-Path $repo 'external/bx/tools/bin/windows/genie.exe'
+
+$platform = @{ 'win-x64' = 'x64'; 'win-arm64' = 'ARM64' }[$Rid]
+$binPrefix = @{ 'win-x64' = 'win64'; 'win-arm64' = 'arm64' }[$Rid]
+$devArch = @{ 'win-x64' = 'x64'; 'win-arm64' = 'arm64' }[$Rid]
+$hostArch = if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq 'Arm64') { 'arm64' } else { 'x64' }
 
 if (!(Test-Path $genie)) {
     Write-Error "genie.exe not found at $genie. Did bootstrap.ps1 init submodules?"
@@ -40,7 +51,7 @@ if (-not (Get-Command msbuild.exe -ErrorAction SilentlyContinue)) {
     if (!(Test-Path $devShellModule)) { Write-Error "DevShell module not found at $devShellModule" }
     Write-Host "[build-native-win] Loading VS dev shell from $vsInstall"
     Import-Module $devShellModule
-    Enter-VsDevShell -VsInstallPath $vsInstall -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64' | Out-Null
+    Enter-VsDevShell -VsInstallPath $vsInstall -SkipAutomaticLocation -DevCmdArguments "-arch=$devArch -host_arch=$hostArch" | Out-Null
 }
 
 # __FILE__ names sources relative to the repo, and each binary names its PDB by file name only.
@@ -61,8 +72,8 @@ try {
     foreach ($proj in @('bgfx-shared-lib', 'shaderc', 'texturec', 'geometryc')) {
         $vcx = "$projDir\$proj.vcxproj"
         if (!(Test-Path $vcx)) { Write-Error "Missing project: $vcx" }
-        Write-Host "[build-native-win] msbuild $vcx /p:Configuration=$Configuration /p:Platform=x64"
-        & msbuild $vcx /m /v:minimal "/p:Configuration=$Configuration" /p:Platform=x64
+        Write-Host "[build-native-win] msbuild $vcx /p:Configuration=$Configuration /p:Platform=$platform"
+        & msbuild $vcx /m /v:minimal "/p:Configuration=$Configuration" "/p:Platform=$platform"
         if ($LASTEXITCODE -ne 0) { Write-Error "msbuild $proj failed: $LASTEXITCODE" }
     }
 }
@@ -71,14 +82,14 @@ finally {
 }
 
 # Locate produced binaries — bgfx names them <target><Configuration>.<ext>.
-$binDir = Join-Path $bgfx ".build\win64_$VsAction\bin"
+$binDir = Join-Path $bgfx ".build\${binPrefix}_$VsAction\bin"
 $sharedDll = Get-ChildItem -Path $binDir -Filter "bgfx-shared-lib$Configuration.dll" -ErrorAction Stop | Select-Object -First 1
 $shaderc = Get-ChildItem -Path $binDir -Filter "shaderc$Configuration.exe" -ErrorAction Stop | Select-Object -First 1
 $texturec = Get-ChildItem -Path $binDir -Filter "texturec$Configuration.exe" -ErrorAction Stop | Select-Object -First 1
 $geometryc = Get-ChildItem -Path $binDir -Filter "geometryc$Configuration.exe" -ErrorAction Stop | Select-Object -First 1
 
-$nativeOut = Join-Path $repo 'artifacts/native/win-x64'
-$toolsOut = Join-Path $repo 'artifacts/tools/win-x64'
+$nativeOut = Join-Path $repo "artifacts/native/$Rid"
+$toolsOut = Join-Path $repo "artifacts/tools/$Rid"
 New-Item -ItemType Directory -Path $nativeOut -Force | Out-Null
 New-Item -ItemType Directory -Path $toolsOut -Force | Out-Null
 
@@ -95,7 +106,7 @@ Copy-Item -Path (Join-Path $bgfx 'src/bgfx_compute.sh')             -Destination
 Copy-Item -Path (Join-Path $bgfx 'examples/common/common.sh')       -Destination $includeOut -Force
 Copy-Item -Path (Join-Path $bgfx 'examples/common/shaderlib.sh')    -Destination $includeOut -Force
 
-Write-Host "[build-native-win] Staged win-x64 artifacts:"
+Write-Host "[build-native-win] Staged $Rid artifacts:"
 Get-ChildItem $nativeOut, $toolsOut | Format-Table Name, Length
 
 # Symbol export check — fail fast if bgfx_init isn't exported.

@@ -33,18 +33,21 @@ jobs:
             runner: windows-2022
             script: pwsh build/build-native-win.ps1
             reuse: true
+          - rid: win-arm64
+            runner: windows-11-arm
+            script: pwsh build/build-native-win.ps1 -Rid win-arm64
+            reuse: true
           - rid: linux-x64
             # The binaries inherit this runner's glibc floor; bx's prebuilt genie needs 2.38, so genie builds from source.
             runner: ubuntu-22.04
             script: bash build/build-native-unix.sh linux-x64
             apt: 'libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev'
             reuse: true
-          # linux-arm64 is deferred — bx's linux-gcc x64 toolchain config
-          # bakes in -m64/-msse4.2/-mfpmath=sse which arm64 gcc rejects, and
-          # bx has no native linux-arm64-gcc action. Re-enable once we
-          # either upstream a linux-arm64 action to bx or maintain a patch.
-          # See build/build-native-unix.sh — the linux-arm64 case + GENie
-          # from-source scaffolding remain in place for that work.
+          - rid: linux-arm64
+            runner: ubuntu-22.04-arm
+            script: bash build/build-native-unix.sh linux-arm64
+            apt: 'libgl1-mesa-dev libx11-dev libxi-dev libxrandr-dev libxinerama-dev libxcursor-dev'
+            reuse: true
           # macos-15 for Xcode 16 (AppleClang 16): the updated bgfx/Dawn Tint uses
           # an overloaded{} std::visit CTAD that AppleClang 15.4 (macos-14) rejects.
           - rid: osx-x64
@@ -146,7 +149,7 @@ jobs:
           sudo apt-get install -y ${{ matrix.apt }}
 
       - name: Set up MSVC (Windows)
-        if: matrix.rid == 'win-x64' && !steps.earlier.outputs.run-id
+        if: startsWith(matrix.rid, 'win-') && !steps.earlier.outputs.run-id
         uses: microsoft/setup-msbuild@v3
 
       - name: Pin Android NDK

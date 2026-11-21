@@ -91,7 +91,7 @@ NuGet.org with `--skip-duplicate`, and creates the GitHub Release.
      reuses an earlier run's build, up to 90 days old, when its pins, build scripts and compilers match.
    - Verify generated bindings match the submodule.
    - Pack `Bgfx.Net` and `Bgfx.Net.Tools`.
-   - Build `tests/Bgfx.Net.Tools.Smoke` against the packed `Bgfx.Net.Tools` on Windows, Linux and macOS, as a
+   - Build `tests/Bgfx.Net.Tools.Smoke` against the packed `Bgfx.Net.Tools` on Windows and Linux (x64 and arm64) and macOS, as a
      consumer would, so a tool path or command line that breaks on one OS stops the release.
    - Build `tests/Bgfx.Net.IosSmoke` against the packed `Bgfx.Net` with NativeAOT, link it for a device,
      and render with Noop and Metal on the iOS simulator.
