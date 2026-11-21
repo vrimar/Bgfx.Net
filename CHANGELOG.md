@@ -4,6 +4,37 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
+## [0.11.0] - 2026-11-20
+
+Breaking release: `Bgfx.Net` targets .NET 11 only, and the package adds iOS, Linux arm64 and Windows arm64.
+
+Breaking:
+- `Bgfx.Net` targets `net11.0` instead of `net10.0`. A project on .NET 10 stays on 0.10.x.
+
+New:
+- iOS: `ios-arm64` and `iossimulator-arm64`, with the Metal renderer, from iOS 16. bgfx ships as a static library that the app links directly, which only NativeAOT can do: set `PublishAot` and publish the app. Any other build warns with `BGFXNET002`, and its first bgfx call throws `DllNotFoundException`. Set `Init.SwapChain.Nwh` to a `CAMetalLayer`.
+- `linux-arm64` and `win-arm64` natives, and `Bgfx.Net.Tools` ships shaderc, texturec and geometryc for both hosts. A linux-arm64 host cannot compile DXBC shaders.
+- `DiagnosticFlags.DrawValidation`: a debug build of bgfx with `Init.Debug` set asserts when a fragment shader output's type doesn't match the frame buffer attachment it writes.
+
+Shader tools (Bgfx.Net.Tools):
+- `varying.def.sc` can give `gl_FragData[N]` a type other than `vec4`, such as `uvec4 gl_FragData[1];` for an integer attachment.
+- shaderc's preprocessor expands named variadic macro parameters correctly.
+- texturec writes EXR files with a correct offset table and orientation, and decodes images with stb_image 2.32.
+
+bgfx changes:
+- Integer color attachments clear correctly, and Direct3D 11 and 12 no longer blend them.
+- Metal times compute views.
+- Resources still alive at shutdown are freed.
+
+bgfx fixes carried on the fork:
+- New: shaderc builds for Windows ARM64.
+- Kept: VK/WebGPU compute-only views in the view stats, and the two shaderc fixes from v0.9.0.
+
+Packaging:
+- Every release first builds an iOS app against the packed `Bgfx.Net` with NativeAOT, links it for a device, and renders with Noop and Metal on the iOS simulator. The shader tools are also checked on Windows and Linux arm64.
+
+bgfx pin: 7068c26229e7be611ac0572c0ed41074daaab4eb (bgfx.net branch: upstream f3bd091b4 plus the four fixes above), BGFX_API_VERSION 170. bx and bimg move to upstream fcaf6fd and b58f8e5.
+
 ## [0.10.0] - 2026-11-16
 
 Breaking release: bgfx moves to API 169, where transient buffers grow on demand and Direct3D 12 is the default renderer on Windows. Shaders compiled by this release's shaderc load only in this release's `Bgfx.Net` or later.
