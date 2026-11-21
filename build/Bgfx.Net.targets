@@ -31,4 +31,25 @@
     <EmccExtraLDFlags>$(EmccExtraLDFlags) --use-port=emdawnwebgpu</EmccExtraLDFlags>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <_BgfxIsIos Condition="'$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64'">true</_BgfxIsIos>
+  </PropertyGroup>
+
+  <!-- The archive keeps bgfx's C API hidden, so only a direct call reaches it: NativeAOT with DirectPInvoke. -->
+  <ItemGroup Condition="'$(_BgfxIsIos)' == 'true'">
+    <NativeReference Include="$(MSBuildThisFileDirectory)ios/$(RuntimeIdentifier)/libbgfx.a">
+      <Kind>Static</Kind>
+      <IsCxx>true</IsCxx>
+      <Frameworks>CoreMedia CoreVideo Foundation Metal QuartzCore UIKit VideoToolbox</Frameworks>
+    </NativeReference>
+    <DirectPInvoke Include="bgfx" />
+  </ItemGroup>
+
+  <Target Name="_BgfxWarnIosWithoutNativeAot"
+          BeforeTargets="Build"
+          Condition="'$(_BgfxIsIos)' == 'true' and ('$(PublishAot)' != 'true' or '$(_IsPublishing)' != 'true')">
+    <Warning Code="BGFXNET002"
+             Text="Bgfx.Net reaches bgfx on iOS only from NativeAOT, which runs when PublishAot is true and the app is published. Any other build throws DllNotFoundException on the first bgfx call." />
+  </Target>
+
 </Project>

@@ -55,6 +55,14 @@ jobs:
             runner: macos-15
             script: bash build/build-native-unix.sh osx-arm64
             reuse: true
+          - rid: ios-arm64
+            runner: macos-26
+            script: bash build/build-native-ios.sh ios-arm64
+            reuse: true
+          - rid: iossimulator-arm64
+            runner: macos-26
+            script: bash build/build-native-ios.sh iossimulator-arm64
+            reuse: true
           # No reuse: the NDK and emscripten versions float outside the fingerprint.
           - rid: android-arm64
             runner: ubuntu-24.04
@@ -181,7 +189,7 @@ jobs:
           retention-days: 14
 
       - name: Upload tools
-        if: ${{ !startsWith(matrix.rid, 'android') && matrix.rid != 'browser-wasm' }}
+        if: ${{ !startsWith(matrix.rid, 'android') && !startsWith(matrix.rid, 'ios') && matrix.rid != 'browser-wasm' }}
         uses: actions/upload-artifact@v7
         with:
           name: bgfx-tools-${{ matrix.rid }}

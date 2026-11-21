@@ -8,8 +8,8 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <PackageId>Bgfx.Net</PackageId>
-    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, linux-x64, osx-x64, osx-arm64, android-arm64, android-x64, and browser-wasm.</Description>
-    <PackageTags>bgfx;graphics;rendering;vulkan;metal;directx;opengl;native</PackageTags>
+    <Description>Cross-platform .NET bindings for the bgfx graphics rendering library, with native binaries bundled for win-x64, linux-x64, osx-x64, osx-arm64, android-arm64, android-x64, ios-arm64, iossimulator-arm64, and browser-wasm.</Description>
+    <PackageTags>bgfx;graphics;rendering;vulkan;metal;directx;opengl;native;ios</PackageTags>
 
     <IsAotCompatible>true</IsAotCompatible>
     <IsTrimmable>true</IsTrimmable>
@@ -35,8 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)..\..\build\Bgfx.Net.NativeAssets.WebAssembly.targets" Pack="true" PackagePath="buildTransitive\netstandard1.0\Bgfx.Net.targets" />
+    <None Include="$(MSBuildThisFileDirectory)..\..\build\Bgfx.Net.targets" Pack="true" PackagePath="buildTransitive\netstandard1.0\Bgfx.Net.targets" />
     <None Include="$(NativeArtifactsDir)browser-wasm\**\*.a" Pack="true" PackagePath="buildTransitive\netstandard1.0\bgfx.a\%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="$(NativeArtifactsDir)ios-arm64\libbgfx.a"          Pack="true" PackagePath="buildTransitive\netstandard1.0\ios\ios-arm64\libbgfx.a"          Condition="Exists('$(NativeArtifactsDir)ios-arm64\libbgfx.a')" />
+    <None Include="$(NativeArtifactsDir)iossimulator-arm64\libbgfx.a" Pack="true" PackagePath="buildTransitive\netstandard1.0\ios\iossimulator-arm64\libbgfx.a" Condition="Exists('$(NativeArtifactsDir)iossimulator-arm64\libbgfx.a')" />
   </ItemGroup>
 
   <Target Name="WarnIfNoNatives" BeforeTargets="Pack" Condition="'$(SkipNativeWarning)' != 'true'">

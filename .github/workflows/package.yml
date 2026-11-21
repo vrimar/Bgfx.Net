@@ -203,9 +203,40 @@ jobs:
           "-p:BgfxNetToolsVersion=$VERSION"
           "-p:RestoreAdditionalProjectSources=$GITHUB_WORKSPACE/packages"
 
+  ios-smoke:
+    name: Bgfx.Net iOS smoke
+    needs: [version, pack]
+    runs-on: xcode-27
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # The iOS workload accepts only the Xcode version it was built against.
+      - name: Select Xcode 27.2
+        run: sudo xcode-select -s /Applications/Xcode_27.2.app
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Install the iOS workload
+        run: dotnet workload install ios
+
+      - name: Download nupkgs
+        uses: actions/download-artifact@v8
+        with:
+          name: nupkgs
+          path: packages/
+
+      - name: Link for device, render on the simulator
+        env:
+          VERSION: ${{ needs.version.outputs.version }}
+        run: bash tests/Bgfx.Net.IosSmoke/run-simulator.sh "$VERSION" "$GITHUB_WORKSPACE/packages"
+
   publish:
     name: dotnet nuget push
-    needs: [pack, tools-smoke]
+    needs: [pack, tools-smoke, ios-smoke]
     if: ${{ (inputs.publish == true) || startsWith(github.ref, 'refs/tags/v') }}
     runs-on: ubuntu-22.04
     environment: nuget

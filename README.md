@@ -19,6 +19,7 @@ OpenGL, OpenGL ES, and Metal backends.
 | Linux | `linux-x64` | Vulkan, OpenGL, WebGPU, Direct3D 12 (WSL) | glibc 2.35 |
 | macOS | `osx-x64`, `osx-arm64` | Metal, Vulkan (needs MoltenVK), WebGPU | macOS 11 |
 | Android | `android-arm64`, `android-x64` | Vulkan, OpenGL ES | API 24 (Android 7.0) |
+| iOS | `ios-arm64`, `iossimulator-arm64` | Metal | iOS 16, NativeAOT |
 | Browser | `browser-wasm` | WebGPU | A browser with WebGPU |
 
 On Android the native `libbgfx.so` is shipped under `runtimes/android-arm64/native`
@@ -30,6 +31,11 @@ gets it bundled into the APK automatically. Two consumer-side notes:
   if you also need the x86_64 emulator.
 - Supply bgfx the native window: set `Init.SwapChain.Nwh` to the `ANativeWindow*`
   obtained from the Java `Surface` via JNI/NDK before `Init`.
+
+On iOS bgfx ships as a static library that the app links directly, which only NativeAOT can
+call: set `PublishAot` and publish the app, or pass `-p:_IsPublishing=true` to a simulator
+build. Any other build warns with `BGFXNET002` and throws `DllNotFoundException` on the first
+bgfx call. Set `Init.SwapChain.Nwh` to a `CAMetalLayer`'s handle before `Init`.
 
 In the browser the WebGPU renderer cannot wait on its own adapter and device requests, so the
 page resolves a `GPUDevice` before the .NET runtime starts and stores it in
