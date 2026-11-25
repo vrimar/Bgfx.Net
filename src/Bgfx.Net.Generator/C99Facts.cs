@@ -7,7 +7,8 @@ internal sealed record TaggedHandle(
     string StructName,
     string EnumName,
     IReadOnlyList<string> Members,
-    IReadOnlyList<TagConversion> Conversions);
+    IReadOnlyList<TagConversion> Conversions
+);
 
 internal sealed record TagConversion(string FromHandle, string Member);
 
@@ -21,31 +22,38 @@ internal sealed class C99Facts
 {
     private static readonly Regex ExportedFunction = new(
         @"BGFX_C_API\s+[^;{]*?\b(bgfx_\w+)\s*\(([^;]*?)\)\s*;",
-        RegexOptions.Singleline | RegexOptions.Compiled);
+        RegexOptions.Singleline | RegexOptions.Compiled
+    );
 
     private static readonly Regex ParameterName = new(
         @"\b(\w+)\s*(?<array>\[\s*\d*\s*\])?\s*$",
-        RegexOptions.Compiled);
+        RegexOptions.Compiled
+    );
 
     private static readonly Regex TagEnum = new(
         @"typedef\s+enum\s+bgfx_(\w+)_type\s*\{(?<body>[^}]*)\}",
-        RegexOptions.Singleline | RegexOptions.Compiled);
+        RegexOptions.Singleline | RegexOptions.Compiled
+    );
 
     private static readonly Regex TagConverter = new(
         @"static\s+inline\s+bgfx_(?<target>\w+)_t\s+bgfx_\w+\s*\(\s*(?:const\s+)?bgfx_(?<source>\w+)_handle_t\s+\w+\s*\)\s*\{(?<body>[^}]*)\}",
-        RegexOptions.Singleline | RegexOptions.Compiled);
+        RegexOptions.Singleline | RegexOptions.Compiled
+    );
 
-    public static C99Facts Empty { get; } = new(
-        new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal),
-        Array.Empty<TaggedHandle>(),
-        new Dictionary<string, string>(StringComparer.Ordinal),
-        new HashSet<string>(StringComparer.Ordinal));
+    public static C99Facts Empty { get; } =
+        new(
+            new Dictionary<string, IReadOnlySet<string>>(StringComparer.Ordinal),
+            Array.Empty<TaggedHandle>(),
+            new Dictionary<string, string>(StringComparer.Ordinal),
+            new HashSet<string>(StringComparer.Ordinal)
+        );
 
     private C99Facts(
         IReadOnlyDictionary<string, IReadOnlySet<string>> arrayParameters,
         IReadOnlyList<TaggedHandle> taggedHandles,
         IReadOnlyDictionary<string, string> variadicFormatParameters,
-        IReadOnlySet<string> vaListFunctions)
+        IReadOnlySet<string> vaListFunctions
+    )
     {
         ArrayParameters = arrayParameters;
         TaggedHandles = taggedHandles;
@@ -93,17 +101,24 @@ internal sealed class C99Facts
 
             if (parameters[^1] == "...")
             {
-                var format = parameters.Count >= 2 ? ParameterName.Match(parameters[^2]) : Match.Empty;
+                var format =
+                    parameters.Count >= 2 ? ParameterName.Match(parameters[^2]) : Match.Empty;
                 if (!format.Success || format.Groups["array"].Success)
                 {
                     throw new InvalidOperationException(
-                        $"{name}: cannot read the format parameter's name before '...' in '{function.Groups[2].Value.Trim()}'.");
+                        $"{name}: cannot read the format parameter's name before '...' in '{function.Groups[2].Value.Trim()}'."
+                    );
                 }
                 variadicFormatParameters[name] = format.Groups[1].Value;
             }
         }
 
-        return new C99Facts(arrayParameters, ParseTaggedHandles(header), variadicFormatParameters, vaListFunctions);
+        return new C99Facts(
+            arrayParameters,
+            ParseTaggedHandles(header),
+            variadicFormatParameters,
+            vaListFunctions
+        );
     }
 
     private static List<TaggedHandle> ParseTaggedHandles(string header)
@@ -113,13 +128,20 @@ internal sealed class C99Facts
         foreach (Match tagEnum in TagEnum.Matches(header))
         {
             var cName = $"bgfx_{tagEnum.Groups[1].Value}";
-            if (!header.Contains($"typedef struct {cName}_s", StringComparison.Ordinal))
+            var handle = Regex.Match(
+                header,
+                @"typedef\s+struct\s+"
+                    + Regex.Escape(cName)
+                    + @"_s\s*\{\s*uint16_t\s+idx\s*;\s*uint16_t\s+type\s*;\s*\}"
+            );
+            if (!handle.Success)
             {
                 continue;
             }
 
             var prefix = $"BGFX_{tagEnum.Groups[1].Value.ToUpperInvariant()}_TYPE_";
-            var members = Regex.Matches(tagEnum.Groups["body"].Value, Regex.Escape(prefix) + @"(\w+)")
+            var members = Regex
+                .Matches(tagEnum.Groups["body"].Value, Regex.Escape(prefix) + @"(\w+)")
                 .Select(m => Pascal(m.Groups[1].Value))
                 .ToList();
             if (members.Count == 0)
@@ -135,12 +157,18 @@ internal sealed class C99Facts
                 {
                     continue;
                 }
-                var assigned = Regex.Match(converter.Groups["body"].Value, Regex.Escape(prefix) + @"(\w+)");
+                var assigned = Regex.Match(
+                    converter.Groups["body"].Value,
+                    Regex.Escape(prefix) + @"(\w+)"
+                );
                 if (assigned.Success)
                 {
-                    conversions.Add(new TagConversion(
-                        Pascal(converter.Groups["source"].Value) + "Handle",
-                        Pascal(assigned.Groups[1].Value)));
+                    conversions.Add(
+                        new TagConversion(
+                            Pascal(converter.Groups["source"].Value) + "Handle",
+                            Pascal(assigned.Groups[1].Value)
+                        )
+                    );
                 }
             }
 
