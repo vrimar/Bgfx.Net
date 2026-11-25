@@ -95,7 +95,7 @@ git submodule update --init --recursive
 
 ## Building locally
 
-Prerequisites: .NET SDK 10, plus a C++ toolchain for your platform
+Prerequisites: .NET SDK 11, plus a C++ toolchain for your platform
 (MSVC on Windows, gcc/clang on Linux, Xcode CLT on macOS). On Windows the native
 build still uses PowerShell (`build-native-win.ps1`). To cross-build the Android
 native lib, install an NDK and run `build-native-android.sh android-arm64`
