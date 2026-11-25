@@ -4,6 +4,37 @@ All notable changes to this project are documented here; each version's section 
 Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html) as [RELEASING.md](RELEASING.md)
 describes.
 
+## [0.12.0] - 2026-11-25
+
+Breaking release: bgfx moves to API 172, where a view's stats are split by the kind of work submitted to it.
+
+Breaking managed API changes:
+- `Stats.NumViews` is renamed `NumViewStats`. A view has one `ViewStats` entry for each kind of work submitted to it, told apart by the new `ViewStats.Type` (`ViewStatsType.Blit`, `Compute` or `Draw`), so the same `ViewStats.View` can appear up to three times.
+
+New:
+- `PlatformData.Queue` takes a Metal command queue as well as a Direct3D 12 one, so bgfx submits on the app's queue. `InternalData.Queue` returns the queue bgfx uses on Direct3D 12 and Metal.
+- Metal: `FrameFlags.DebugCapture` writes a `.gputrace` file when Xcode isn't attached and `MTL_CAPTURE_ENABLED=1` is set.
+- Compute shaders can use two-channel 16- and 32-bit float, integer and unsigned images, and Metal reports `RG11B10F` as writable from compute.
+
+Shader tools (Bgfx.Net.Tools):
+- shaderc records which `i_dataN` each instance input is in SPIR-V and WGSL shaders, so Vulkan and WebGPU bind it by index rather than by position. Shaders built by earlier shaderc still load.
+- texturec reads and writes PFM images, writes EXR as `RGBA32F` as well as `RGBA16F`, and decodes an EXR without an alpha channel as opaque.
+- geometryc builds with meshoptimizer 1.3.
+
+bgfx changes:
+- Instanced draws on Vulkan, OpenGL, Metal and WebGPU feed each `i_dataN` to the input the shader declares for it, rather than assuming instance inputs follow the vertex attributes.
+- OpenGL maps depth to 0..1 with `ARB_clip_control` where the driver has it, instead of patching every vertex shader.
+- Render passes and MSAA resolves cover only the rect a view renders into, leaving the rest of the frame buffer as it was.
+- Uploading to and reading back a 3D texture's slices work on every renderer.
+- Metal: updating an index buffer no longer writes past its end, buffers still alive at shutdown are freed, a buffer at the last stage is bound, and a compute view that follows a blit gets a compute encoder.
+- Direct3D 11: a blit between a buffer and a texture no longer conflicts with the bound frame buffer, a clear covers every layer of a layered attachment, and `Init.Capabilities` without `CapsFlags.TextureDirectAccess` turns direct texture access off.
+
+bgfx fixes carried on the fork:
+- Dropped: VK/WebGPU compute-only views in the view stats, which upstream's per-type view stats cover.
+- Kept: the two shaderc fixes from v0.9.0, and the Windows ARM64 shaderc build from v0.11.0.
+
+bgfx pin: 225dfd041c3174b87a5674f91c93c8549448c7be (bgfx.net branch: upstream 3fe177f61 plus the three fixes above), BGFX_API_VERSION 172. bx and bimg move to upstream b8ee10a and 38ceda5.
+
 ## [0.11.0] - 2026-11-20
 
 Breaking release: `Bgfx.Net` targets .NET 11 only, and the package adds iOS, Linux arm64 and Windows arm64.
