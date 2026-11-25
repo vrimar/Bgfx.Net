@@ -2599,6 +2599,26 @@ public enum ViewMode
 		Count
 	}
 
+public enum ViewStatsType
+	{
+		/// <summary>
+		/// Blits submitted to the view.
+		/// </summary>
+		Blit,
+	
+		/// <summary>
+		/// Compute dispatches submitted to the view.
+		/// </summary>
+		Compute,
+	
+		/// <summary>
+		/// Draw calls submitted to the view.
+		/// </summary>
+		Draw,
+	
+		Count
+	}
+
 public enum ShadingRate
 	{
 		/// <summary>
@@ -2738,6 +2758,7 @@ public unsafe struct InternalData
 	{
 		public Caps* Caps;
 		public void* Context;
+		public void* Queue;
 	}
 
 public unsafe struct PlatformData
@@ -2916,6 +2937,7 @@ public unsafe struct ViewStats
 	{
 		public fixed byte Name[256];
 		public ushort View;
+		public ViewStatsType Type;
 		public long CpuTimeBegin;
 		public long CpuTimeEnd;
 		public long GpuTimeBegin;
@@ -2976,7 +2998,7 @@ public unsafe struct Stats
 		public ushort Height;
 		public ushort TextWidth;
 		public ushort TextHeight;
-		public ushort NumViews;
+		public ushort NumViewStats;
 		public ViewStats* ViewStats;
 		public byte NumEncoders;
 		public EncoderStats* EncoderStats;

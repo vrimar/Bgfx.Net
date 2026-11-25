@@ -2592,6 +2592,26 @@ public static partial class bgfx
 		Count
 	}
 	
+	public enum ViewStatsType
+	{
+		/// <summary>
+		/// Blits submitted to the view.
+		/// </summary>
+		Blit,
+	
+		/// <summary>
+		/// Compute dispatches submitted to the view.
+		/// </summary>
+		Compute,
+	
+		/// <summary>
+		/// Draw calls submitted to the view.
+		/// </summary>
+		Draw,
+	
+		Count
+	}
+	
 	public enum ShadingRate
 	{
 		/// <summary>
@@ -2731,6 +2751,7 @@ public static partial class bgfx
 	{
 		public Caps* caps;
 		public void* context;
+		public void* queue;
 	}
 	
 	public unsafe struct PlatformData
@@ -2909,6 +2930,7 @@ public static partial class bgfx
 	{
 		public fixed byte name[256];
 		public ushort view;
+		public ViewStatsType type;
 		public long cpuTimeBegin;
 		public long cpuTimeEnd;
 		public long gpuTimeBegin;
@@ -2969,7 +2991,7 @@ public static partial class bgfx
 		public ushort height;
 		public ushort textWidth;
 		public ushort textHeight;
-		public ushort numViews;
+		public ushort numViewStats;
 		public ViewStats* viewStats;
 		public byte numEncoders;
 		public EncoderStats* encoderStats;
